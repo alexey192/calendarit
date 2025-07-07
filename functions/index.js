@@ -1,5 +1,7 @@
 const functions = require('firebase-functions');
 const { onCall } = require('firebase-functions/v2/https');
+const { onRequest } = require('firebase-functions/v2/https');
+const cors = require('cors')({ origin: true });
 const { onMessagePublished } = require('firebase-functions/v2/pubsub');
 
 const admin = require('firebase-admin');
@@ -9,38 +11,58 @@ const fetch = require('node-fetch');
 admin.initializeApp();
 
 // 🔔 1. Subscribe to Gmail Push
-exports.subscribeToGmailPush = functions.https.onCall(async (data, context) => {
-  const { uid, accountId } = data;
+exports.subscribeToGmailPush = onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+      }
 
-  if (!uid || !accountId) {
-    throw new functions.https.HttpsError('invalid-argument', 'Missing uid or accountId');
-  }
+      const { uid, accountId } = req.body;
 
-  const docRef = admin.firestore().collection('users').doc(uid).collection('gmailAccounts').doc(accountId);
-  const accountDoc = await docRef.get();
-  if (!accountDoc.exists) {
-    throw new functions.https.HttpsError('not-found', 'Gmail account not found');
-  }
+      if (!uid || !accountId) {
+        return res.status(400).json({ error: 'Missing uid or accountId' });
+      }
 
-  const { accessToken } = accountDoc.data();
-  const gmail = google.gmail({ version: 'v1' });
+      const docRef = admin
+        .firestore()
+        .collection('users')
+        .doc(uid)
+        .collection('gmailAccounts')
+        .doc(accountId);
 
-  const res = await gmail.users.watch({
-    userId: 'me',
-    requestBody: {
-      labelIds: ['INBOX'],
-      topicName: 'projects/calendarit-464412/topics/gmail-watch-topic', // ✅ Replace with actual topic
-    },
-    auth: new google.auth.OAuth2().setCredentials({ access_token: accessToken }),
+      const accountDoc = await docRef.get();
+      if (!accountDoc.exists) {
+        return res.status(404).json({ error: 'Gmail account not found' });
+      }
+
+      const { accessToken } = accountDoc.data();
+      const auth = new google.auth.OAuth2();
+      auth.setCredentials({ access_token: accessToken });
+
+      const gmail = google.gmail({ version: 'v1', auth });
+
+      const watchResponse = await gmail.users.watch({
+        userId: 'me',
+        requestBody: {
+          labelIds: ['INBOX'],
+          topicName: 'projects/calendarit-464412/topics/gmail-watch-topic',
+        },
+      });
+
+      const { historyId } = watchResponse.data;
+      if (historyId) {
+        await docRef.update({ lastHistoryId: historyId });
+      }
+
+      return res.status(200).json({ success: true, historyId });
+    } catch (err) {
+      console.error('subscribeToGmailPush error:', err);
+      return res.status(500).json({ error: 'Internal server error', details: err.message });
+    }
   });
-
-  const { historyId } = res.data;
-  if (historyId) {
-    await docRef.update({ lastHistoryId: historyId });
-  }
-
-  return { success: true, historyId };
 });
+
 
 // 📥 2. Handle Gmail Push Notifications
 exports.handleGmailPush = onMessagePublished('gmail-watch-topic', async (event) => {

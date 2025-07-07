@@ -82,12 +82,20 @@ class _GmailWebRedirectScreenState extends State<GmailWebRedirectScreen> {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      await FirebaseFunctions.instance.httpsCallable('subscribeToGmailPush').call({
-        'uid': user.uid,
-        'accountId': accountId,
-        'email': email,
-        'refreshToken': refreshToken,
-      });
+      print('Calling subscribeToGmailPush...');
+      print('uid: ${user.uid}, accountId: $accountId');
+
+      final resp = await http.post(
+        Uri.parse('https://us-central1-calendar-it-31e1c.cloudfunctions.net/subscribeToGmailPush'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'uid': user.uid,
+          'accountId': accountId,
+        }),
+      );
+      print('Response: ${resp.body}');
+
+
 
       setState(() => message = '✅ Gmail connected!');
       await Future.delayed(const Duration(seconds: 2));
