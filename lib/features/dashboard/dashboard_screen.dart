@@ -1,40 +1,54 @@
-import 'package:calendarit/features/dashboard/widgets/event_list_placeholder.dart';
-import 'package:calendarit/features/dashboard/widgets/horizontal_card_carousel.dart';
-import 'package:calendarit/features/dashboard/widgets/section_title.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import '../../models/connected_account.dart';
+import 'widgets/horizontal_card_carousel.dart';
+import 'widgets/section_title.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendar-it'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => context.go('/settings'),
-          ),
-        ],
+        title: const Text('Dashboard'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const SectionTitle(title: 'Connections'),
-          const SizedBox(height: 8),
-          const HorizontalCardCarousel(type: 'mail'),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SectionTitle(title: 'Connections'),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .collection('gmailAccounts')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                final docs = snapshot.data?.docs ?? [];
 
-          const SizedBox(height: 24),
-          const SectionTitle(title: 'Calendars'),
-          const SizedBox(height: 8),
-          const HorizontalCardCarousel(type: 'calendar'),
-          const SizedBox(height: 24),
-          const SectionTitle(title: 'Found Events'),
-          const SizedBox(height: 8),
-          EventListPlaceholder(),
-        ],
+                final accounts = docs.map((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  return ConnectedAccount(
+                    email: data['email'] ?? '',
+                    type: AccountType.gmail,
+                  );
+                }).toList();
+
+                return HorizontalCardCarousel(accounts: accounts);
+              },
+            ),
+            const SizedBox(height: 24),
+            const SectionTitle(title: 'Calendars'),
+            const HorizontalCardCarousel(accounts: []), // Placeholder
+            const SizedBox(height: 24),
+            const SectionTitle(title: 'Events'),
+            const Placeholder(), // You can replace with your EventList
+          ],
+        ),
       ),
     );
   }

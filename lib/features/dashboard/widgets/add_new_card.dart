@@ -1,25 +1,58 @@
 import 'package:flutter/material.dart';
+import '../../../services/gmail_auth_service.dart';
 
 class AddNewCard extends StatelessWidget {
-  final String label;
-  const AddNewCard({required this.label});
+  const AddNewCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.grey.shade200,
-      child: Container(
-        width: 80,
-        height: 80,
+    return GestureDetector(
+      onTap: () => _showProviderPicker(context),
+      child: SizedBox(
+        width: 100,
+        child: Card(
+          color: Colors.grey[200],
+          child: const Center(
+            child: Icon(Icons.add, size: 40),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showProviderPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.add, size: 28),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12),
+            ListTile(
+              leading: const Icon(Icons.email),
+              title: const Text('Gmail'),
+              onTap: () async {
+                Navigator.of(context).pop();
+                try {
+                  await GmailAuthService().connectAccount();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Gmail account connected!')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.mail_outline),
+              title: const Text('Microsoft Outlook (Coming soon)'),
+              onTap: () {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Outlook support coming soon')),
+                );
+              },
             ),
           ],
         ),

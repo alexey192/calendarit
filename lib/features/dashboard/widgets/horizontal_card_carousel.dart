@@ -1,34 +1,44 @@
 import 'package:flutter/material.dart';
-
-import 'add_new_card.dart';
+import '../../../models/connected_account.dart';
 import 'icon_card.dart';
+import 'add_new_card.dart';
 
 class HorizontalCardCarousel extends StatelessWidget {
-  final String type; // 'mail' or 'calendar'
-  const HorizontalCardCarousel({required this.type});
+  final List<ConnectedAccount> accounts;
+
+  const HorizontalCardCarousel({super.key, required this.accounts});
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      Icons.email,
-      Icons.email_outlined,
-      Icons.alternate_email,
-    ];
-
     return SizedBox(
-      height: 80,
+      height: 120,
       child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
-        itemCount: items.length + 1,
+        itemCount: accounts.length + 1,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
-          if (index < items.length) {
-            return IconCard(icon: items[index]);
-          } else {
-            return AddNewCard(label: 'Add ${type == 'mail' ? 'Mailbox' : 'Calendar'}');
+          if (index == accounts.length) {
+            return const AddNewCard();
           }
+
+          final account = accounts[index];
+
+          return IconCard(
+            icon: _iconForType(account.type),
+            label: account.email,
+          );
         },
       ),
     );
+  }
+
+  IconData _iconForType(AccountType type) {
+    switch (type) {
+      case AccountType.gmail:
+        return Icons.email; // Later can be replaced with Gmail logo if needed
+      case AccountType.outlook:
+        return Icons.mail_outline;
+    }
   }
 }
