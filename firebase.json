@@ -1,0 +1,42 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "calendar-it-31e1c",
+          "appId": "1:291994231151:android:bbff3f20d1d1db8ed3089a",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "calendar-it-31e1c",
+          "appId": "1:291994231151:ios:3dc53150e94a5ef6d3089a",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "calendar-it-31e1c",
+          "configurations": {
+            "android": "1:291994231151:android:bbff3f20d1d1db8ed3089a",
+            "ios": "1:291994231151:ios:3dc53150e94a5ef6d3089a",
+            "web": "1:291994231151:web:2011f9d7aca5b5dbd3089a"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "europe-west1"
+    }
+  }
+}
