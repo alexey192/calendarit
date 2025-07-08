@@ -1,60 +1,49 @@
 import 'package:flutter/material.dart';
-import '../../../services/gmail_auth_service.dart';
+import '../../../app/styles.dart';
 
 class AddNewCard extends StatelessWidget {
   const AddNewCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showProviderPicker(context),
-      child: SizedBox(
-        width: 100,
-        child: Card(
-          color: Colors.grey[200],
-          child: const Center(
-            child: Icon(Icons.add, size: 40),
-          ),
-        ),
+    return Container(
+      width: 180,
+      height: 70,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primaryColor.withOpacity(0.4), width: 1.2),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 3,
+            offset: Offset(0, 1.5),
+          )
+        ],
       ),
-    );
-  }
-
-  void _showProviderPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.email),
-              title: const Text('Gmail'),
-              onTap: () async {
-                Navigator.of(context).pop();
-                try {
-                  await GmailAuthService().connectAccount();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Gmail account connected!')),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
-                  );
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.mail_outline),
-              title: const Text('Microsoft Outlook (Coming soon)'),
-              onTap: () {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Outlook support coming soon')),
-                );
-              },
-            ),
-          ],
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          // TODO: trigger account linking
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              const Icon(Icons.add_circle_outline, size: 32, color: AppColors.primaryColor),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Add Account',
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

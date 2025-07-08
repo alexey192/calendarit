@@ -148,7 +148,7 @@ Location | Title | Description | Date | Tag`;
 
     console.log(`🔍 Processing message ID: ${msg.id}`);
 
-    console.log(`🔑 Using access token: ${process.env.OPENAI_API_KEY.substring(0, 10)}...`);
+    //console.log(`🔑 Using access token: ${process.env.OPENAI_API_KEY.substring(0, 10)}...`);
     //const openAiKey = process.env.OPENAI_API_KEY;
     const openAiKey = '[REDACTED_OPENAI_KEY]';
 

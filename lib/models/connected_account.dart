@@ -1,4 +1,4 @@
-enum AccountType { gmail, outlook }
+enum AccountType { gmail }
 
 class ConnectedAccount {
   final String email;
