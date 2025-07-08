@@ -147,12 +147,15 @@ Location | Title | Description | Date | Tag`;
     const fullPrompt = `${prompt}\n\n${subject}\n\n${body}`;
 
     console.log(`🔍 Processing message ID: ${msg.id}`);
-    console.log(`🔑 Using access token: ${accessToken.substring(0, 10)}...`);
+
+    console.log(`🔑 Using access token: ${process.env.OPENAI_API_KEY.substring(0, 10)}...`);
+    //const openAiKey = process.env.OPENAI_API_KEY;
+    const openAiKey = '[REDACTED_OPENAI_KEY]';
 
     const openAiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${openAiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

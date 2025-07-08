@@ -41,7 +41,9 @@ class _GmailWebRedirectScreenState extends State<GmailWebRedirectScreen> {
     try {
       const clientId = '[REDACTED_GOOGLE_CLIENT_ID]';
       const clientSecret = '[REDACTED_GOOGLE_CLIENT_SECRET]'; // only okay for dev
-      const redirectUri = 'http://localhost:65508/oauth2redirect';
+
+      const redirectUri = 'https://calendar-it-31e1c.web.app/oauth2redirect';
+      //const redirectUri = 'http://localhost:65508/oauth2redirect';
 
       final response = await http.post(
         Uri.parse('https://oauth2.googleapis.com/token'),
