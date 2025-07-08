@@ -1,17 +1,15 @@
-const functions = require('firebase-functions');
 const { onCall } = require('firebase-functions/v2/https');
 const { onRequest } = require('firebase-functions/v2/https');
 const cors = require('cors')({ origin: true });
 const { onMessagePublished } = require('firebase-functions/v2/pubsub');
-
-const admin = require('firebase-admin');
 const { google } = require('googleapis');
 const fetch = require('node-fetch');
-
+const functions = require('firebase-functions'); // v3
+const admin = require('firebase-admin');
 admin.initializeApp();
 
 // 🔔 1. Subscribe to Gmail Push
-exports.subscribeToGmailPush = onRequest((req, res) => {
+exports.subscribeToGmailPushApi = onRequest((req, res) => {
   cors(req, res, async () => {
     try {
       if (req.method !== 'POST') {
@@ -45,8 +43,8 @@ exports.subscribeToGmailPush = onRequest((req, res) => {
       const watchResponse = await gmail.users.watch({
         userId: 'me',
         requestBody: {
-          labelIds: ['INBOX'],
-          topicName: 'projects/calendarit-464412/topics/gmail-watch-topic',
+          //labelIds: ['INBOX'],
+          topicName: 'projects/calendar-it-31e1c/topics/gmail-watch-topic',
         },
       });
 
@@ -66,37 +64,68 @@ exports.subscribeToGmailPush = onRequest((req, res) => {
 
 // 📥 2. Handle Gmail Push Notifications
 exports.handleGmailPush = onMessagePublished('gmail-watch-topic', async (event) => {
-  const message = event.data?.json;
-  if (!message || !message.emailAddress || !message.historyId) return;
+  console.log('📬 Gmail Push Triggered');
+
+  const rawData = event.data?.message?.data;
+  if (!rawData) {
+    console.warn("⚠️ Missing data in PubSub event");
+    return;
+  }
+
+  const jsonString = Buffer.from(rawData, 'base64').toString('utf8');
+  const message = JSON.parse(jsonString);
+  console.log("📨 Payload:", JSON.stringify(message, null, 2));
 
   const userEmail = message.emailAddress;
   const historyId = message.historyId;
 
-  const data = message.json;
+  if (!userEmail || !historyId) {
+    console.warn("⚠️ Missing userEmail or historyId");
+    return;
+  }
 
-  if (!userEmail || !historyId) return;
+  console.log(`🔍 Looking for Gmail account with email: ${userEmail}`);
 
   // 🔍 Find the Gmail account
-  const usersSnapshot = await admin.firestore().collectionGroup('gmailAccounts').where('email', '==', userEmail).get();
-  if (usersSnapshot.empty) return;
+  const snapshot = await admin.firestore()
+    .collectionGroup('gmailAccounts')
+    .where('email', '==', userEmail)
+    .get();
 
-  const accountDoc = usersSnapshot.docs[0];
+  if (snapshot.empty) {
+    console.warn(`❌ No Gmail account found for email: ${userEmail}`);
+    return;
+  }
+
+  const accountDoc = snapshot.docs[0];
+
   const { accessToken, refreshToken } = accountDoc.data();
-  const [uid, , accountId] = accountDoc.ref.path.split('/');
+
+  const segments = accountDoc.ref.path.split('/');
+  const uid = segments[1];
+  const accountId = segments[3];
+
+  console.log(`✅ Found account. UID: ${uid}, Account ID: ${accountId}`);
 
   const oAuth2Client = new google.auth.OAuth2();
+
   oAuth2Client.setCredentials({ access_token: accessToken, refresh_token: refreshToken });
+  //oAuth2Client.setCredentials({ access_token: accessToken }); // no refresh_token
 
   const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
 
   const accountRef = admin.firestore().collection('users').doc(uid).collection('gmailAccounts').doc(accountId);
   const lastHistoryId = (await accountRef.get()).data().lastHistoryId;
 
+  console.log(`🔍 Last historyId: ${lastHistoryId}`);
+
   const historyRes = await gmail.users.history.list({
     userId: 'me',
     startHistoryId: lastHistoryId,
     historyTypes: ['messageAdded'],
   });
+
+  console.log(`📜 History response: ${JSON.stringify(historyRes.data, null, 2)}`);
 
   const messages = historyRes.data.history?.flatMap(h => h.messages || []) || [];
 
@@ -112,13 +141,18 @@ exports.handleGmailPush = onMessagePublished('gmail-watch-topic', async (event) 
     const subject = subjectHeader?.value || '';
     const body = extractBody(payload);
 
-    const prompt = `You are a smart assistant that reads the content of emails and extracts structured event information for a personal calendar... (truncated for brevity)`;
+    const prompt = `You are a smart assistant that reads the content of emails and extracts structured event information for a personal calendar. The expected format is:
+Location | Title | Description | Date | Tag`;
 
     const fullPrompt = `${prompt}\n\n${subject}\n\n${body}`;
+
+    console.log(`🔍 Processing message ID: ${msg.id}`);
+    console.log(`🔑 Using access token: ${accessToken.substring(0, 10)}...`);
+
     const openAiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${functions.config().openai.key}`,
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -131,13 +165,25 @@ exports.handleGmailPush = onMessagePublished('gmail-watch-topic', async (event) 
       }),
     });
 
-    const openAiJson = await openAiRes.json();
+    const responseText = await openAiRes.text();
+
+    if (!openAiRes.ok) {
+      console.error(`❌ OpenAI API error (${openAiRes.status}):`, responseText);
+      throw new Error('OpenAI API error');
+    }
+
+    const openAiJson = JSON.parse(responseText);
+
     const text = openAiJson.choices?.[0]?.message?.content?.trim();
+
+    console.log(`🔍 OpenAI response for message ID ${msg.id}: ${text}`);
 
     if (!text || !text.includes('|')) continue; // No structured output
 
     const [location, title, description, date, tag] = text.split('|').map(s => s.trim());
     if (!title || !date) continue;
+
+    console.log(`📅 Extracted event: ${title} on ${date}`);
 
     await admin.firestore().collection('users').doc(uid).collection('events').add({
       location,
@@ -157,6 +203,7 @@ exports.handleGmailPush = onMessagePublished('gmail-watch-topic', async (event) 
   await accountRef.update({ lastHistoryId: historyId });
 });
 
+
 // 📦 Extract text body from Gmail payload
 function extractBody(payload) {
   const getPart = (p) => {
@@ -175,3 +222,4 @@ function extractBody(payload) {
   if (!data) return '';
   return Buffer.from(data, 'base64').toString('utf-8');
 }
+

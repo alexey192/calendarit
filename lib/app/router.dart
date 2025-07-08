@@ -53,6 +53,5 @@ final GoRouter router = GoRouter(
       path: '/oauth2redirect',
       builder: (context, state) => const GmailWebRedirectScreen(),
     ),
-
   ],
 );

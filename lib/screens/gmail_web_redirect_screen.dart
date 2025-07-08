@@ -86,7 +86,7 @@ class _GmailWebRedirectScreenState extends State<GmailWebRedirectScreen> {
       print('uid: ${user.uid}, accountId: $accountId');
 
       final resp = await http.post(
-        Uri.parse('https://us-central1-calendar-it-31e1c.cloudfunctions.net/subscribeToGmailPush'),
+        Uri.parse('https://us-central1-calendar-it-31e1c.cloudfunctions.net/subscribeToGmailPushApi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'uid': user.uid,
@@ -95,11 +95,9 @@ class _GmailWebRedirectScreenState extends State<GmailWebRedirectScreen> {
       );
       print('Response: ${resp.body}');
 
-
-
       setState(() => message = '✅ Gmail connected!');
       await Future.delayed(const Duration(seconds: 2));
-      context.go('/');
+      context.go('/dashboard');
     } catch (e) {
       setState(() => message = '❌ Error: $e');
     }
