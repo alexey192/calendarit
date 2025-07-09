@@ -8,6 +8,7 @@ import '../features/auth/forgot_password_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/event_details/event_details_screen.dart';
 import '../features/connections/connections_screen.dart';
+import '../features/dashboard/dashboard_screen2.dart';
 import '../features/settings/settings_screen.dart';
 import '../screens/gmail_web_redirect_screen.dart';
 
@@ -52,6 +53,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/oauth2redirect',
       builder: (context, state) => const GmailWebRedirectScreen(),
+    ),
+    GoRoute(
+      path: '/dashboard2',
+      builder: (context, state) => const DashboardScreen2(),
     ),
   ],
 );
