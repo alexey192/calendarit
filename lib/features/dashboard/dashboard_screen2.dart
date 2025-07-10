@@ -159,16 +159,30 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
                       children: [
                         Expanded(
                           flex: 2,
-                          child: CardWrapper(
-                            height: 400,
-                            child: SfCalendar(
-                              view: CalendarView.week,
-                              todayHighlightColor: Colors.deepPurpleAccent,
-                              headerStyle: const CalendarHeaderStyle(
-                                textAlign: TextAlign.center,
-                                textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Your Schedule',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 16),
+                              CardWrapper(
+                                height: 400,
+                                child: SfCalendar(
+                                  view: CalendarView.week,
+                                  todayHighlightColor: Colors.deepPurpleAccent,
+                                  headerStyle: const CalendarHeaderStyle(
+                                    textAlign: TextAlign.center,
+                                    textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -178,7 +192,7 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Highlights',
+                                'Pending events',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
@@ -209,7 +223,7 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
                                   }
 
                                   return CardWrapper(
-                                    height: 350,
+                                    height: 400,
                                     child: ListView.separated(
                                       itemCount: docs.length,
                                       separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -217,17 +231,49 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
                                         final data = docs[index].data() as Map<String, dynamic>;
                                         final doc = docs[index];
 
-                                        return CompactEventCard(
-                                          title: data['title'] ?? 'Untitled',
-                                          date: data['date'] ?? 'No date',
-                                          location: data['location'] ?? 'No location',
-                                          onAccept: () => doc.reference.update({'status': 'accepted'}),
-                                          onDecline: () => doc.reference.update({'status': 'declined'}),
-                                          onEdit: () => ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Edit coming soon!'),
-                                              backgroundColor: Colors.blue,
+                                        return Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: Colors.grey.withOpacity(0.2),
+                                              width: 1,
                                             ),
+                                          ),
+                                          child: CompactEventCard(
+                                            title: data['title'] ?? 'Untitled Event',
+                                            date: data['date'] ?? 'No date',
+                                            location: data['location'] ?? 'No location',
+                                            onAccept: () {
+                                              doc.reference.update({'status': 'accepted'});
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Event accepted!'),
+                                                  backgroundColor: Colors.green,
+                                                  behavior: SnackBarBehavior.floating,
+                                                ),
+                                              );
+                                            },
+                                            onDecline: () {
+                                              doc.reference.update({'status': 'declined'});
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Event declined!'),
+                                                  backgroundColor: Colors.red,
+                                                  behavior: SnackBarBehavior.floating,
+                                                ),
+                                              );
+                                            },
+                                            onEdit: () {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Edit functionality coming soon!'),
+                                                  backgroundColor: Colors.blue,
+                                                  behavior: SnackBarBehavior.floating,
+                                                ),
+                                              );
+                                            },
                                           ),
                                         );
                                       },
@@ -241,6 +287,7 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
                       ],
                     ),
                   ),
+
 
                   const SizedBox(height: 32),
 
