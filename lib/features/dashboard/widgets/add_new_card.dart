@@ -8,18 +8,22 @@ class AddNewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => showProviderPickerModal(context),
-      child: SizedBox(
-        width: 120,
-        height: 120,
-        child: Card(
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
           color: Colors.grey[100],
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Center(
-            child: Icon(Icons.add, size: 40, color: Colors.black54),
-          ),
+          shape: BoxShape.circle,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            )
+          ],
+        ),
+        child: const Center(
+          child: Icon(Icons.add, size: 40, color: Colors.black54),
         ),
       ),
     );

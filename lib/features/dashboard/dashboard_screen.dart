@@ -108,8 +108,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FadeTransition(opacity: _fadeAnimation, child: HeaderSection(user: user)),
-                  const SizedBox(height: 24),
+                  // Removed HeaderSection
+                  // FadeTransition(opacity: _fadeAnimation, child: HeaderSection(user: user)),
+                  // const SizedBox(height: 24),
+
+                  /// Your Connections Heading
+                  Text(
+                    'Your connections',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                  const SizedBox(height: 0),
 
                   /// Gmail Connections (Top)
                   SlideTransition(
@@ -154,7 +166,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 0),
 
                   /// Calendar + Highlights
                   SlideTransition(
