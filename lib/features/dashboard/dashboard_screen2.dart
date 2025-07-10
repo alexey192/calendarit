@@ -1,18 +1,17 @@
-// dashboard_screen2.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'dart:math';
 
 import '../../models/connected_account.dart';
 import 'widgets/card_wrapper.dart';
 import 'widgets/event_list_widget.dart';
-import 'widgets/highlights_section.dart';
 import 'widgets/header_section.dart';
-import 'widgets/week_calendar_section.dart';
+import 'widgets/compact_event_card.dart';
+import 'widgets/horizontal_card_carousel.dart';
 
 class DashboardScreen2 extends StatefulWidget {
   const DashboardScreen2({super.key});
@@ -32,8 +31,6 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
 
   final List<types.Message> _messages = [];
   final types.User _user = const types.User(id: 'user-1');
-
-  DateTime _focusedDay = DateTime.now();
 
   @override
   void initState() {
@@ -95,26 +92,159 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF6366F1),
-              Color(0xFF8B5CF6),
-              Color(0xFFEC4899),
-            ],
+            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
           ),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
                   FadeTransition(opacity: _fadeAnimation, child: HeaderSection(user: user)),
-                  const SizedBox(height: 40),
-                  SlideTransition(position: _slideAnimation, child: WeekCalendarSection(uid: user.uid)),
+                  const SizedBox(height: 24),
+
+                  /// Gmail Connections (Top)
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .collection('gmailAccounts')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          final docs = snapshot.data?.docs ?? [];
+                          final accounts = docs.map((doc) {
+                            final data = doc.data() as Map<String, dynamic>;
+                            return ConnectedAccount(
+                              email: data['email'] ?? '',
+                              type: AccountType.gmail,
+                            );
+                          }).toList();
+
+                          return accounts.isEmpty
+                              ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Icon(Icons.link_off_rounded, size: 32, color: Colors.grey.shade300),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'No connections yet',
+                                    style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                              : HorizontalCardCarousel(accounts: accounts);
+                        },
+                      ),
+                    ),
+                  ),
+
                   const SizedBox(height: 32),
+
+                  /// Calendar + Highlights
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: CardWrapper(
+                            height: 400,
+                            child: SfCalendar(
+                              view: CalendarView.week,
+                              todayHighlightColor: Colors.deepPurpleAccent,
+                              headerStyle: const CalendarHeaderStyle(
+                                textAlign: TextAlign.center,
+                                textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 1,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Highlights',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .collection('events')
+                                    .orderBy('createdAt', descending: true)
+                                    .limit(5)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  final docs = snapshot.data?.docs ?? [];
+                                  if (docs.isEmpty) {
+                                    return CardWrapper(
+                                      height: 200,
+                                      child: Center(
+                                        child: Text(
+                                          'No events to highlight',
+                                          style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  return CardWrapper(
+                                    height: 350,
+                                    child: ListView.separated(
+                                      itemCount: docs.length,
+                                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                      itemBuilder: (context, index) {
+                                        final data = docs[index].data() as Map<String, dynamic>;
+                                        final doc = docs[index];
+
+                                        return CompactEventCard(
+                                          title: data['title'] ?? 'Untitled',
+                                          date: data['date'] ?? 'No date',
+                                          location: data['location'] ?? 'No location',
+                                          onAccept: () => doc.reference.update({'status': 'accepted'}),
+                                          onDecline: () => doc.reference.update({'status': 'declined'}),
+                                          onEdit: () => ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Edit coming soon!'),
+                                              backgroundColor: Colors.blue,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  /// Events & AI Assistant
                   ScaleTransition(
                     scale: _scaleAnimation,
                     child: Row(
@@ -194,6 +324,7 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 40),
                 ],
               ),
