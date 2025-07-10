@@ -11,6 +11,8 @@ class GmailAuthService {
   static const _redirectUriMobile = 'com.calendarit.calendarit:/oauthredirect';
   static const _scopes = [
     'https://www.googleapis.com/auth/gmail.readonly',
+    'https://www.googleapis.com/auth/calendar.readonly',
+    'https://www.googleapis.com/auth/calendar.events',
     'email',
     'openid',
   ];
