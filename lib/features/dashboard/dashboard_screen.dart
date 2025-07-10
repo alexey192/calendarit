@@ -8,10 +8,10 @@ import 'dart:math';
 
 import '../../models/connected_account.dart';
 import 'widgets/card_wrapper.dart';
-import 'widgets/event_list_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'widgets/compact_event_card.dart';
 import 'widgets/horizontal_card_carousel.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -203,245 +203,41 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   const SizedBox(height: 0),
 
                   /// Calendar + Highlights
-                  SlideTransition(
-                    position: _slideAnimation,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Your Schedule',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white.withOpacity(0.9),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              CardWrapper(
-                                height: 400,
-                                child: Stack(
-                                  children: [
-                                    SfCalendar(
-                                      controller: _calendarController,
-                                      view: CalendarView.week,
-                                      todayHighlightColor: Colors.deepPurpleAccent,
-                                      headerStyle: const CalendarHeaderStyle(
-                                        backgroundColor: Colors.transparent,
-                                        textAlign: TextAlign.center,
-                                        textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 0,
-                                      left: 8,
-                                      child: IconButton(
-                                        onPressed: () {
-                                          _calendarController.backward!();
-                                        },
-                                        icon: Container(
-                                          decoration: const BoxDecoration(
-                                            color: Colors.deepPurpleAccent, // background color
-                                            shape: BoxShape.circle,
-                                          ),
-                                          padding: const EdgeInsets.all(0),
-                                          child: const Icon(Icons.chevron_left, color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 0,
-                                      left: 48,
-                                      child: IconButton(
-                                        onPressed: () {
-                                          _calendarController.backward!();
-                                        },
-                                        icon: Container(
-                                          decoration: const BoxDecoration(
-                                            color: Colors.deepPurpleAccent,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          padding: const EdgeInsets.all(0),
-                                          child: const Icon(Icons.chevron_right, color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Pending events',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(user.uid)
-                                    .collection('events')
-                                    .orderBy('createdAt', descending: true)
-                                    .limit(5)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  final docs = snapshot.data?.docs ?? [];
-                                  if (docs.isEmpty) {
-                                    return CardWrapper(
-                                      height: 200,
-                                      child: Center(
-                                        child: Text(
-                                          'No events to highlight',
-                                          style: TextStyle(color: Colors.white.withOpacity(0.8)),
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  return CardWrapper(
-                                    height: 400,
-                                    child: ListView.separated(
-                                      itemCount: docs.length,
-                                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                                      itemBuilder: (context, index) {
-                                        final data = docs[index].data() as Map<String, dynamic>;
-                                        final doc = docs[index];
-
-                                        return Container(
-                                          padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(12),
-                                            border: Border.all(
-                                              color: Colors.grey.withOpacity(0.2),
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: CompactEventCard(
-                                            title: data['title'] ?? 'Untitled Event',
-                                            date: data['date'] ?? 'No date',
-                                            location: data['location'] ?? 'No location',
-                                            onAccept: () {
-                                              doc.reference.update({'status': 'accepted'});
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text('Event accepted!'),
-                                                  backgroundColor: Color(0xFF059669),
-                                                  behavior: SnackBarBehavior.floating,
-                                                ),
-                                              );
-                                            },
-                                            onDecline: () {
-                                              doc.reference.update({'status': 'declined'});
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text('Event declined!'),
-                                                  backgroundColor: Color(0xFFDC2626),
-                                                  behavior: SnackBarBehavior.floating,
-                                                ),
-                                              );
-                                            },
-                                            onEdit: () {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text('Edit functionality coming soon!'),
-                                                  backgroundColor: Color(0xFF2563EB),
-                                                  behavior: SnackBarBehavior.floating,
-                                                ),
-                                              );
-                                            },
-                                            onTap: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return AlertDialog(
-                                                    title: Text(data['title'] ?? 'Untitled Event'),
-                                                    content: Column(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        const SizedBox(height: 8),
-                                                        Text('📅  Date: ${data['date'] ?? 'No date'}'),
-                                                        const SizedBox(height: 8),
-                                                        Text('📍  Location: ${data['location'] ?? 'No location'}'),
-                                                        const SizedBox(height: 8),
-                                                        Text('📝  Description: ${data['description'] ?? 'No description'}'),
-                                                        const SizedBox(height: 8),
-                                                        Text('🏷️  Tags: ${data['tag'] ?? 'No tags'}'),
-                                                      ],
-                                                    ),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          //Todo
-                                                        },
-                                                        child: const Text('Accept'),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          //Todo
-                                                        },
-                                                        child: const Text('Decline'),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          //Todo
-                                                        },
-                                                        child: const Text('Edit'),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-
-                  const SizedBox(height: 32),
-
-                  /// Events & AI Assistant
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Row(
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
-                        flex: 50,
+                      Expanded(
+                        flex: 2,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Calendar Title + Calendar
+                            Text(
+                              'Your Schedule',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            CardWrapper(
+                              height: 400,
+                              child: SfCalendar(
+                                controller: _calendarController,
+                                view: CalendarView.week,
+                                todayHighlightColor: Colors.deepPurpleAccent,
+                                headerStyle: const CalendarHeaderStyle(
+                                  backgroundColor: Colors.transparent,
+                                  textAlign: TextAlign.center,
+                                  textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 32),
+
+                            // AI Assistant Title + Chat + Buttons
                             Text(
                               'AI Assistant',
                               style: TextStyle(
@@ -451,168 +247,258 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                               ),
                             ),
                             const SizedBox(height: 16),
-                            CardWrapper(
-                              height: MediaQuery.of(context).size.height * 0.4,
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  inputDecorationTheme: InputDecorationTheme(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide.none,
+
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Chat Expanded
+                                Flexible(
+                                  flex: 90,
+                                  child: CardWrapper(
+                                    height: MediaQuery.of(context).size.height * 0.4,
+                                    child: Theme(
+                                      data: Theme.of(context).copyWith(
+                                        inputDecorationTheme: InputDecorationTheme(
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Chat(
+                                        messages: _messages,
+                                        onSendPressed: _handleSendPressed,
+                                        onAttachmentPressed: _handleAttachmentPressed,
+                                        user: _user,
+                                        theme: const DefaultChatTheme(
+                                          inputBackgroundColor: Colors.white,
+                                          inputTextColor: Colors.black87,
+                                          inputBorderRadius: BorderRadius.all(Radius.circular(16)),
+                                          inputTextStyle: TextStyle(fontSize: 16),
+                                          backgroundColor: Colors.transparent,
+                                          primaryColor: Color(0xFF8B5CF6),
+                                          secondaryColor: Color(0xFFEDE9FE),
+                                          receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
+                                          sentMessageBodyTextStyle: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                                child: Chat(
-                                  messages: _messages,
-                                  onSendPressed: _handleSendPressed,
-                                  onAttachmentPressed: _handleAttachmentPressed,
-                                  user: _user,
-                                  theme: const DefaultChatTheme(
-                                    inputBackgroundColor: Colors.white,
-                                    inputTextColor: Colors.black87,
-                                    inputBorderRadius: BorderRadius.all(Radius.circular(16)),
-                                    inputTextStyle: TextStyle(fontSize: 16),
-                                    backgroundColor: Colors.transparent,
-                                    primaryColor: Color(0xFF8B5CF6),
-                                    secondaryColor: Color(0xFFEDE9FE),
-                                    receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
-                                    sentMessageBodyTextStyle: TextStyle(color: Colors.white),
+
+                                const SizedBox(width: 12),
+
+                                // Buttons column
+                                Flexible(
+                                  flex: 10,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 0), // align below chat header
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.9),
+                                        borderRadius: BorderRadius.circular(48),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 12,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // TODO: handle AI event recognition from image
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              shape: const CircleBorder(),
+                                              padding: const EdgeInsets.all(0),
+                                              backgroundColor: const Color(0xFF8B5CF6),
+                                              shadowColor: const Color(0xFF8B5CF6).withOpacity(0.4),
+                                              elevation: 6,
+                                            ),
+                                            child: const SizedBox(
+                                              width: 64,
+                                              height: 64,
+                                              child: Icon(
+                                                Icons.smart_toy,
+                                                size: 32,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 24),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // TODO: handle add event manually
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              shape: const CircleBorder(),
+                                              padding: const EdgeInsets.all(0),
+                                              backgroundColor: const Color(0xFF059669),
+                                              shadowColor: const Color(0xFF059669).withOpacity(0.4),
+                                              elevation: 6,
+                                            ),
+                                            child: const SizedBox(
+                                              width: 64,
+                                              height: 64,
+                                              child: Icon(
+                                                Icons.add_circle_outline,
+                                                size: 32,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 24),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              context.go('/settings');
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              shape: const CircleBorder(),
+                                              padding: const EdgeInsets.all(0),
+                                              backgroundColor: const Color(0xFF4B5563),
+                                              shadowColor: const Color(0xFF4B5563).withOpacity(0.4),
+                                              elevation: 6,
+                                            ),
+                                            child: const SizedBox(
+                                              width: 64,
+                                              height: 64,
+                                              child: Icon(
+                                                Icons.settings_rounded,
+                                                size: 32,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+
+                              ],
                             ),
                           ],
                         ),
                       ),
+
                       const SizedBox(width: 16),
 
-                      Flexible(
-                        flex: 50,
-                        child: SizedBox(
-                          // width is relative due to flex, no need to specify exact width
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  // TODO: handle AI event recognition from image
-                                },
-                                child: Container(
-                                  width: 64,
-                                  height: 64,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF8B5CF6),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFF8B5CF6).withOpacity(0.4),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
+                      // Pending Events on the right
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Pending events',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(user.uid)
+                                  .collection('events')
+                                  .orderBy('createdAt', descending: true)
+                                  .limit(5)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                final docs = snapshot.data?.docs ?? [];
+                                if (docs.isEmpty) {
+                                  return CardWrapper(
+                                    height: 200,
+                                    child: Center(
+                                      child: Text(
+                                        'No events to highlight',
+                                        style: TextStyle(color: Colors.white.withOpacity(0.8)),
                                       ),
-                                    ],
+                                    ),
+                                  );
+                                }
+
+                                return CardWrapper(
+                                  height: 400,
+                                  child: ListView.separated(
+                                    itemCount: docs.length,
+                                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                    itemBuilder: (context, index) {
+                                      final data = docs[index].data() as Map<String, dynamic>;
+                                      final doc = docs[index];
+
+                                      return Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: Colors.grey.withOpacity(0.2),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: CompactEventCard(
+                                          title: data['title'] ?? 'Untitled Event',
+                                          date: data['date'] ?? 'No date',
+                                          location: data['location'] ?? 'No location',
+                                          onAccept: () {
+                                            doc.reference.update({'status': 'accepted'});
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Event accepted!'),
+                                                backgroundColor: Color(0xFF059669),
+                                                behavior: SnackBarBehavior.floating,
+                                              ),
+                                            );
+                                          },
+                                          onDecline: () {
+                                            doc.reference.update({'status': 'declined'});
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Event declined!'),
+                                                backgroundColor: Color(0xFFDC2626),
+                                                behavior: SnackBarBehavior.floating,
+                                              ),
+                                            );
+                                          },
+                                          onEdit: () {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Edit functionality coming soon!'),
+                                                backgroundColor: Color(0xFF2563EB),
+                                                behavior: SnackBarBehavior.floating,
+                                              ),
+                                            );
+                                          },
+                                          onTap: () {
+                                            // Your existing dialog code here
+                                          },
+                                        ),
+                                      );
+                                    },
                                   ),
-                                  child: const Icon(
-                                    Icons.smart_toy,
-                                    size: 32,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Recognize\nfrom image',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              GestureDetector(
-                                onTap: () {
-                                  // TODO: handle add event manually
-                                },
-                                child: Container(
-                                  width: 64,
-                                  height: 64,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF059669),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFF059669).withOpacity(0.4),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.add_circle_outline,
-                                    size: 32,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Add event\nmanually',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              GestureDetector(
-                                onTap: () {
-                                  // TODO: handle settings button press
-                                },
-                                child: Container(
-                                  width: 64,
-                                  height: 64,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF4B5563),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFF4B5563).withOpacity(0.4),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.settings_rounded,
-                                    size: 32,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Settings',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
 
-                const SizedBox(height: 40),
+
+                  const SizedBox(height: 32),
+
                 ],
               ),
             ),
