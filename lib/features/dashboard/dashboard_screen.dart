@@ -32,10 +32,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   final List<types.Message> _messages = [];
   final types.User _user = const types.User(id: 'user-1');
 
+  final CalendarController _calendarController = CalendarController();
+
   @override
   void initState() {
     super.initState();
     _initAnimations();
+
+    _calendarController.view = CalendarView.week;
 
     _fadeController.forward();
     Future.delayed(const Duration(milliseconds: 200), () => _slideController.forward());
@@ -72,6 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     _fadeController.dispose();
     _slideController.dispose();
     _scaleController.dispose();
+    _calendarController.dispose();
     super.dispose();
   }
 
@@ -162,24 +167,69 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Your Schedule',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Your Schedule',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white.withOpacity(0.9),
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 16),
                               CardWrapper(
                                 height: 400,
-                                child: SfCalendar(
-                                  view: CalendarView.week,
-                                  todayHighlightColor: Colors.deepPurpleAccent,
-                                  headerStyle: const CalendarHeaderStyle(
-                                    textAlign: TextAlign.center,
-                                    textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
+                                child: Stack(
+                                  children: [
+                                    SfCalendar(
+                                      controller: _calendarController,
+                                      view: CalendarView.week,
+                                      todayHighlightColor: Colors.deepPurpleAccent,
+                                      headerStyle: const CalendarHeaderStyle(
+                                        backgroundColor: Colors.transparent,
+                                        textAlign: TextAlign.center,
+                                        textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      left: 8,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          _calendarController.backward!();
+                                        },
+                                        icon: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.deepPurpleAccent, // background color
+                                            shape: BoxShape.circle,
+                                          ),
+                                          padding: const EdgeInsets.all(0),
+                                          child: const Icon(Icons.chevron_left, color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      left: 48,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          _calendarController.backward!();
+                                        },
+                                        icon: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.deepPurpleAccent,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          padding: const EdgeInsets.all(0),
+                                          child: const Icon(Icons.chevron_right, color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
