@@ -9,7 +9,7 @@ import 'dart:math';
 import '../../models/connected_account.dart';
 import 'widgets/card_wrapper.dart';
 import 'widgets/event_list_widget.dart';
-import 'widgets/header_section.dart';
+import 'package:image_picker/image_picker.dart';
 import 'widgets/compact_event_card.dart';
 import 'widgets/horizontal_card_carousel.dart';
 
@@ -29,10 +29,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
 
-  final List<types.Message> _messages = [];
+  final List<types.Message> _messages = [
+    types.TextMessage(
+    author: types.User(id: 'assistant', firstName: 'AI Assistant'),
+    id: 'init_msg_1',
+    text: 'Hello!\nHow can I help you today?',
+    createdAt: DateTime.now().millisecondsSinceEpoch,
+  ),
+  ];
+
   final types.User _user = const types.User(id: 'user-1');
 
   final CalendarController _calendarController = CalendarController();
+
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -44,6 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     _fadeController.forward();
     Future.delayed(const Duration(milliseconds: 200), () => _slideController.forward());
     Future.delayed(const Duration(milliseconds: 400), () => _scaleController.forward());
+
   }
 
   void _initAnimations() {
@@ -70,6 +81,29 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       _messages.insert(0, textMessage);
     });
   }
+
+  Future<void> _handleAttachmentPressed() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        final imageMessage = types.ImageMessage(
+          author: _user,
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          name: image.name,
+          size: await image.length(),
+          uri: image.path,
+        );
+
+        setState(() {
+          _messages.insert(0, imageMessage);
+        });
+      }
+    } catch (e) {
+      // handle errors here if you want
+      print('Image picker error: $e');
+    }
+  }
+
 
   @override
   void dispose() {
@@ -398,87 +432,187 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   const SizedBox(height: 32),
 
                   /// Events & AI Assistant
-                  ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Your Events',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
+                ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        flex: 50,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'AI Assistant',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withOpacity(0.9),
                               ),
-                              const SizedBox(height: 16),
-                              CardWrapper(
-                                height: MediaQuery.of(context).size.height * 0.4,
-                                child: const EventListWidget(),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'AI Assistant',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              CardWrapper(
-                                height: MediaQuery.of(context).size.height * 0.4,
-                                child: Theme(
-                                  data: Theme.of(context).copyWith(
-                                    inputDecorationTheme: InputDecorationTheme(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Chat(
-                                    messages: _messages,
-                                    onSendPressed: _handleSendPressed,
-                                    user: _user,
-                                    theme: const DefaultChatTheme(
-                                      inputBackgroundColor: Colors.white,
-                                      inputTextColor: Colors.black87,
-                                      inputBorderRadius: BorderRadius.all(Radius.circular(16)),
-                                      inputTextStyle: TextStyle(fontSize: 16),
-                                      backgroundColor: Colors.transparent,
-                                      primaryColor: Color(0xFF8B5CF6),
-                                      secondaryColor: Color(0xFFEDE9FE),
-                                      receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
-                                      sentMessageBodyTextStyle: TextStyle(color: Colors.white),
+                            ),
+                            const SizedBox(height: 16),
+                            CardWrapper(
+                              height: MediaQuery.of(context).size.height * 0.4,
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide.none,
                                     ),
                                   ),
                                 ),
+                                child: Chat(
+                                  messages: _messages,
+                                  onSendPressed: _handleSendPressed,
+                                  onAttachmentPressed: _handleAttachmentPressed,
+                                  user: _user,
+                                  theme: const DefaultChatTheme(
+                                    inputBackgroundColor: Colors.white,
+                                    inputTextColor: Colors.black87,
+                                    inputBorderRadius: BorderRadius.all(Radius.circular(16)),
+                                    inputTextStyle: TextStyle(fontSize: 16),
+                                    backgroundColor: Colors.transparent,
+                                    primaryColor: Color(0xFF8B5CF6),
+                                    secondaryColor: Color(0xFFEDE9FE),
+                                    receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
+                                    sentMessageBodyTextStyle: TextStyle(color: Colors.white),
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                      const SizedBox(width: 16),
 
-                  const SizedBox(height: 40),
+                      Flexible(
+                        flex: 50,
+                        child: SizedBox(
+                          // width is relative due to flex, no need to specify exact width
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  // TODO: handle AI event recognition from image
+                                },
+                                child: Container(
+                                  width: 64,
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF8B5CF6),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF8B5CF6).withOpacity(0.4),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.smart_toy,
+                                    size: 32,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Recognize\nfrom image',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              GestureDetector(
+                                onTap: () {
+                                  // TODO: handle add event manually
+                                },
+                                child: Container(
+                                  width: 64,
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF059669),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF059669).withOpacity(0.4),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.add_circle_outline,
+                                    size: 32,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Add event\nmanually',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              GestureDetector(
+                                onTap: () {
+                                  // TODO: handle settings button press
+                                },
+                                child: Container(
+                                  width: 64,
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF4B5563),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF4B5563).withOpacity(0.4),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.settings_rounded,
+                                    size: 32,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Settings',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 40),
                 ],
               ),
             ),
