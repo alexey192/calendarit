@@ -135,7 +135,7 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
                               ),
                               const SizedBox(height: 16),
                               CardWrapper(
-                                height: MediaQuery.of(context).size.height * 0.5,
+                                height: MediaQuery.of(context).size.height * 0.4,
                                 child: const EventListWidget(),
                               ),
                             ],
@@ -157,7 +157,7 @@ class _DashboardScreen2State extends State<DashboardScreen2> with TickerProvider
                               ),
                               const SizedBox(height: 16),
                               CardWrapper(
-                                height: MediaQuery.of(context).size.height * 0.5,
+                                height: MediaQuery.of(context).size.height * 0.4,
                                 child: Theme(
                                   data: Theme.of(context).copyWith(
                                     inputDecorationTheme: InputDecorationTheme(
