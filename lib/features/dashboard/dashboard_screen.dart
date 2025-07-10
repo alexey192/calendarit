@@ -312,7 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                               ScaffoldMessenger.of(context).showSnackBar(
                                                 const SnackBar(
                                                   content: Text('Event accepted!'),
-                                                  backgroundColor: Colors.green,
+                                                  backgroundColor: Color(0xFF059669),
                                                   behavior: SnackBarBehavior.floating,
                                                 ),
                                               );
@@ -322,7 +322,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                               ScaffoldMessenger.of(context).showSnackBar(
                                                 const SnackBar(
                                                   content: Text('Event declined!'),
-                                                  backgroundColor: Colors.red,
+                                                  backgroundColor: Color(0xFFDC2626),
                                                   behavior: SnackBarBehavior.floating,
                                                 ),
                                               );
@@ -331,9 +331,53 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                               ScaffoldMessenger.of(context).showSnackBar(
                                                 const SnackBar(
                                                   content: Text('Edit functionality coming soon!'),
-                                                  backgroundColor: Colors.blue,
+                                                  backgroundColor: Color(0xFF2563EB),
                                                   behavior: SnackBarBehavior.floating,
                                                 ),
+                                              );
+                                            },
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: Text(data['title'] ?? 'Untitled Event'),
+                                                    content: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        const SizedBox(height: 8),
+                                                        Text('📅  Date: ${data['date'] ?? 'No date'}'),
+                                                        const SizedBox(height: 8),
+                                                        Text('📍  Location: ${data['location'] ?? 'No location'}'),
+                                                        const SizedBox(height: 8),
+                                                        Text('📝  Description: ${data['description'] ?? 'No description'}'),
+                                                        const SizedBox(height: 8),
+                                                        Text('🏷️  Tags: ${data['tag'] ?? 'No tags'}'),
+                                                      ],
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          //Todo
+                                                        },
+                                                        child: const Text('Accept'),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          //Todo
+                                                        },
+                                                        child: const Text('Decline'),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          //Todo
+                                                        },
+                                                        child: const Text('Edit'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
                                               );
                                             },
                                           ),
