@@ -117,7 +117,7 @@ class _SignInScreenState extends State<SignInScreen>
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthSuccess) {
-                context.go('/dashboard2');
+                context.go('/dashboard');
               } else if (state is AuthFailure) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
