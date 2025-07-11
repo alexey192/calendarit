@@ -9,8 +9,6 @@ class TodoListSection extends StatefulWidget {
 
 class _TodoListSectionState extends State<TodoListSection> {
   final List<_TodoItem> _todos = [
-    _TodoItem('Reply to client email'),
-    _TodoItem('Schedule design review'),
     _TodoItem('Prepare pitch deck'),
   ];
 
