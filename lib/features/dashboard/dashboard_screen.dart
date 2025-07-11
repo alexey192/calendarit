@@ -138,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                   right: 0,
                                   top: 12,
                                   child: IconButton(
-                                    icon: const Icon(Icons.settings, color: Colors.white, size: 32),
+                                    icon: const Icon(Icons.settings, color: Colors.white, size: 48),
                                     onPressed: () {
                                       // Open settings screen or modal
                                     },
