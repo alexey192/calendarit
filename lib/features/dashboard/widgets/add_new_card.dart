@@ -9,8 +9,8 @@ class AddNewCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => showProviderPickerModal(context),
       child: Container(
-        width: 48,
-        height: 48,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           color: Colors.grey[100],
           shape: BoxShape.circle,

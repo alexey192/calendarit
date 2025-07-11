@@ -75,7 +75,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           child: SizedBox(
-                            height: 80, // adjust height if needed
+                            height: 60, // adjust height if needed
                             width: double.infinity,
                             child: Stack(
                               children: [
@@ -122,11 +122,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 // Greeting (centered)
                                 Positioned(
                                   left: MediaQuery.of(context).size.width / 2 - 60, // adjust -60 if text is too far off
-                                  top: 24,
+                                  top: 20,
                                   child: Text(
                                     'Calendar IT',
                                     style: TextStyle(
-                                      fontSize: 24,
+                                      fontSize: 28,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white.withOpacity(0.9),
                                     ),
@@ -138,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                   right: 0,
                                   top: 12,
                                   child: IconButton(
-                                    icon: const Icon(Icons.settings, color: Colors.white, size: 48),
+                                    icon: const Icon(Icons.settings, color: Colors.white, size: 40),
                                     onPressed: () {
                                       // Open settings screen or modal
                                     },
