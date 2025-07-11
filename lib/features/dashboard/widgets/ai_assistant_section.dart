@@ -128,10 +128,10 @@ class _ActionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(48),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -144,7 +144,7 @@ class _ActionButtons extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _roundButton(
-            icon: Icons.smart_toy,
+            icon: Icons.image,
             color: const Color(0xFF8B5CF6),
             onPressed: () {
               // TODO: AI from image
