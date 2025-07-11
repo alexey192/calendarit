@@ -80,8 +80,8 @@ class IconCard extends StatelessWidget {
     };
 
     return Container(
-      width: 60,
-      height: 60,
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
         color: AppColors.surfaceColor,
         shape: BoxShape.circle,

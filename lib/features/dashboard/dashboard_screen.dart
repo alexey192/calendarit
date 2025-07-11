@@ -67,65 +67,92 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Your connections',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                    const SizedBox(height: 0),
-
                     // Gmail Connections
                     SlideTransition(
                       position: _animations.slideAnimation,
                       child: FadeTransition(
                         opacity: _animations.fadeAnimation,
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(user.uid)
-                              .collection('gmailAccounts')
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            final docs = snapshot.data?.docs ?? [];
-                            final accounts = docs.map((doc) {
-                              final data = doc.data() as Map<String, dynamic>;
-                              return ConnectedAccount(
-                                email: data['email'] ?? '',
-                                type: AccountType.gmail,
-                              );
-                            }).toList();
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: SizedBox(
+                            height: 80, // adjust height if needed
+                            width: double.infinity,
+                            child: Stack(
+                              children: [
+                                // Gmail Connections (left side)
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.4,
+                                    child: StreamBuilder<QuerySnapshot>(
+                                      stream: FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(user.uid)
+                                          .collection('gmailAccounts')
+                                          .snapshots(),
+                                      builder: (context, snapshot) {
+                                        final docs = snapshot.data?.docs ?? [];
+                                        final accounts = docs.map((doc) {
+                                          final data = doc.data() as Map<String, dynamic>;
+                                          return ConnectedAccount(
+                                            email: data['email'] ?? '',
+                                            type: AccountType.gmail,
+                                          );
+                                        }).toList();
 
-                            return accounts.isEmpty
-                                ? Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: Center(
-                                child: Row(
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Icon(Icons.link_off_rounded, size: 32, color: Colors.grey.shade300),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'No connections yet',
-                                          style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
-                                        ),
-                                      ],
+                                        return accounts.isEmpty
+                                            ? Row(
+                                          children: [
+                                            Icon(Icons.link_off_rounded, size: 32, color: Colors.grey.shade300),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'No connections yet',
+                                              style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            const AddNewCard(),
+                                          ],
+                                        )
+                                            : HorizontalCardCarousel(accounts: accounts);
+                                      },
                                     ),
-                                    AddNewCard(),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            )
-                                : HorizontalCardCarousel(accounts: accounts);
-                          },
+
+                                // Greeting (centered)
+                                Positioned(
+                                  left: MediaQuery.of(context).size.width / 2 - 60, // adjust -60 if text is too far off
+                                  top: 24,
+                                  child: Text(
+                                    'Calendar IT',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white.withOpacity(0.9),
+                                    ),
+                                  ),
+                                ),
+
+                                // Settings icon (right)
+                                Positioned(
+                                  right: 0,
+                                  top: 12,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.settings, color: Colors.white, size: 32),
+                                    onPressed: () {
+                                      // Open settings screen or modal
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+
+                    const SizedBox(height: 12),
 
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
