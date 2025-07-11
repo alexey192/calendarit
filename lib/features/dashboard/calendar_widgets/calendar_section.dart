@@ -30,6 +30,9 @@ class CalendarSection extends StatelessWidget {
                 textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               dataSource: _CalendarDataSource(state.events),
+              showNavigationArrow: true,
+              allowDragAndDrop: true,
+              allowAppointmentResize: true,
             ),
           );
         }

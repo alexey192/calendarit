@@ -12,6 +12,7 @@ import 'widgets/pending_events_section.dart';
 import 'widgets/ai_assistant_section.dart';
 import 'calendar_widgets//calendar_section.dart';
 import 'widgets/dashboard_animations.dart';
+import 'widgets/todo_list_section.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -152,7 +153,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         const SizedBox(width: 16),
                         const Expanded(
                           flex: 1,
-                          child: PendingEventsSection(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              PendingEventsSection(),
+                              SizedBox(height: 24),
+                              TodoListSection(),
+                            ],
+                          ),
                         ),
                       ],
                     ),
