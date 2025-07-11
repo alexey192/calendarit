@@ -44,7 +44,6 @@ class _TodoListSectionState extends State<TodoListSection> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +61,7 @@ class _TodoListSectionState extends State<TodoListSection> {
 
         // Main container with fixed height
         Container(
-          height: screenHeight * 0.4,
+          height: MediaQuery.of(context).size.height * 0.4,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.9),
@@ -124,18 +123,18 @@ class _TodoListSectionState extends State<TodoListSection> {
               Expanded(
                 child: ListView.separated(
                   itemCount: _todos.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => const SizedBox(height: 6),
                   itemBuilder: (context, index) {
                     final todo = _todos[index];
 
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.symmetric(vertical: 4),   // smaller margin
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8), // smaller padding
+                      margin: const EdgeInsets.symmetric(vertical: 0),   // smaller margin
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), // smaller padding
                       decoration: BoxDecoration(
                         color: todo.isDone
                             ? Colors.greenAccent.withOpacity(0.3)
-                            : const Color(0xFFEDE9FE),
+                            : Colors.black12,// const Color(0xFFEDE9FE),
                         borderRadius: BorderRadius.circular(32),
                       ),
                       child: Row(

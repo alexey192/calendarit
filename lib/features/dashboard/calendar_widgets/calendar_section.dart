@@ -31,7 +31,7 @@ class CalendarSection extends StatelessWidget {
               ),
               dataSource: _CalendarDataSource(state.events),
               showNavigationArrow: true,
-              allowDragAndDrop: true,
+              allowDragAndDrop: false,
               allowAppointmentResize: true,
             ),
           );
