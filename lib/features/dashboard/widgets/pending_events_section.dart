@@ -18,7 +18,7 @@ class PendingEventsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Pending events',
+          'Pending Events',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,

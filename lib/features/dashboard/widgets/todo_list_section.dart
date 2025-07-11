@@ -50,14 +50,14 @@ class _TodoListSectionState extends State<TodoListSection> {
       children: [
         // Header outside container
         Text(
-          'Your To-Do List',
+          'To-Do List',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.white.withOpacity(0.9),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
         // Main container with fixed height
         Container(
@@ -109,7 +109,7 @@ class _TodoListSectionState extends State<TodoListSection> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF6366F1),
+                        color: Color(0xFF8B5CF6),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.add, color: Colors.white),

@@ -156,8 +156,9 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
+                              const SizedBox(width: 16),
                               PendingEventsSection(),
-                              SizedBox(height: 24),
+                              SizedBox(height: 32),
                               TodoListSection(),
                             ],
                           ),
