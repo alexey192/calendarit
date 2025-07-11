@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:go_router/go_router.dart';
 
+import '../app/const_values.dart';
+
 class GmailWebRedirectScreen extends StatefulWidget {
   const GmailWebRedirectScreen({super.key});
 
@@ -39,11 +41,13 @@ class _GmailWebRedirectScreenState extends State<GmailWebRedirectScreen> {
     }
 
     try {
-      const clientId = '[REDACTED_GOOGLE_CLIENT_ID]';
-      const clientSecret = '[REDACTED_GOOGLE_CLIENT_SECRET]'; // only okay for dev
-
-      const redirectUri = 'https://calendar-it-31e1c.web.app/oauth2redirect';
+      //const clientId = '[REDACTED_GOOGLE_CLIENT_ID]';
+      //const clientSecret = '[REDACTED_GOOGLE_CLIENT_SECRET]'; // only okay for dev
+      //const redirectUri = 'https://calendar-it-31e1c.web.app/oauth2redirect';
       //const redirectUri = 'http://localhost:65508/oauth2redirect';
+      const clientId = ConstValues.clientId;
+      const clientSecret = ConstValues.clientSecret;
+      const redirectUri = ConstValues.redirectUriWeb;
 
       final response = await http.post(
         Uri.parse('https://oauth2.googleapis.com/token'),

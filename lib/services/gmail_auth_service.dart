@@ -2,13 +2,19 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter/material.dart';
-import 'dart:html' as html; // Only works on Web
+import 'dart:html' as html;
+
+import '../app/const_values.dart'; // Only works on Web
 
 class GmailAuthService {
-  static const _clientId = '[REDACTED_GOOGLE_CLIENT_ID]';
+  /*static const _clientId = '[REDACTED_GOOGLE_CLIENT_ID]';
   //static const _redirectUriWeb = 'http://localhost:65508/oauth2redirect'; // Or your deployed frontend
   static const _redirectUriWeb = 'https://calendar-it-31e1c.web.app/oauth2redirect';
-  static const _redirectUriMobile = 'com.calendarit.calendarit:/oauthredirect';
+  static const _redirectUriMobile = 'com.calendarit.calendarit:/oauthredirect';*/
+  static const _clientId = ConstValues.clientId;
+  static const _redirectUriWeb = ConstValues.redirectUriWeb;
+  static const _redirectUriMobile = ConstValues.redirectUriMobile;
+
   static const _scopes = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/calendar.readonly',
