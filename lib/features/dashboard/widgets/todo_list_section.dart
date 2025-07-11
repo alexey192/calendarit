@@ -60,7 +60,7 @@ class _TodoListSectionState extends State<TodoListSection> {
             color: Colors.white.withOpacity(0.9),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         // Main container with fixed height
         Container(
@@ -138,7 +138,7 @@ class _TodoListSectionState extends State<TodoListSection> {
                         color: todo.isDone
                             ? Colors.greenAccent.withOpacity(0.3)
                             : const Color(0xFFEDE9FE),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(32),
                       ),
                       child: Row(
                         children: [

@@ -150,7 +150,7 @@ class _ActionButtons extends StatelessWidget {
               // TODO: AI from image
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           _roundButton(
             icon: Icons.add_circle_outline,
             color: const Color(0xFF059669),
@@ -158,7 +158,7 @@ class _ActionButtons extends StatelessWidget {
               // TODO: Add event manually
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           _roundButton(
             icon: Icons.settings_rounded,
             color: const Color(0xFF4B5563),

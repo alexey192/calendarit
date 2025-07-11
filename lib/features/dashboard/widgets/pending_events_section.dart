@@ -40,11 +40,11 @@ class PendingEventsSection extends StatelessWidget {
 
             if (docs.isEmpty) {
               return CardWrapper(
-                height: 200,
+                height: 400,
                 child: Center(
                   child: Text(
                     'No pending events',
-                    style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                    style: TextStyle(color: Colors.black45.withOpacity(0.8)),
                   ),
                 ),
               );
