@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:calendarit/app/const_values.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
@@ -10,14 +10,20 @@ class CloudVisionOcrService {
 
   static Future<String?> extractTextFromImage() async {
     // Pick image
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
-    if (result == null || result.files.single.path == null) return null;
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
 
-    final imageFile = File(result.files.single.path!);
-    final bytes = await imageFile.readAsBytes();
-    final base64Image = base64Encode(bytes);
+    print("CloudVisionOcrService: User picked image: ${result?.files.single.name}");
+    if (result == null || result.files.single.bytes == null) return null;
 
-    final body = jsonEncode({
+    final Uint8List imageBytes = result.files.single.bytes!;
+    final String base64Image = base64Encode(imageBytes);
+
+    print("CloudVisionOcrService: Base64 encoded image size: ${base64Image.length} characters");
+
+    final requestBody = jsonEncode({
       "requests": [
         {
           "image": {
@@ -33,13 +39,15 @@ class CloudVisionOcrService {
     final response = await http.post(
       Uri.parse("$_endpoint?key=$_apiKey"),
       headers: {"Content-Type": "application/json"},
-      body: body,
+      body: requestBody,
     );
+
+    print("CloudVisionOcrService: Response status code: ${response.statusCode}");
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      final fullText = jsonResponse['responses']?[0]?['fullTextAnnotation']?['text'];
-      return fullText?.trim();
+      final text = jsonResponse['responses']?[0]?['fullTextAnnotation']?['text'];
+      return text?.trim();
     } else {
       print("Vision API failed: ${response.statusCode} ${response.body}");
       return null;

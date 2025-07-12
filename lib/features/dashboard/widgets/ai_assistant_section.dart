@@ -222,6 +222,18 @@ class _ActionButtons extends StatelessWidget {
                 eventData: eventData,
                 accountIds: accountIds,
                 onConfirm: ({required accountId, required title, required start, required end, String? location}) async {
+                  final newSuggestion = EventSuggestion(
+                    title: title,
+                    location: location ?? '',
+                    start: start,
+                    end: end,
+                    isTimeSpecified: suggestion.isTimeSpecified,
+                    description: suggestion.description,
+                    category: suggestion.category,
+                  );
+                  await saveSuggestedEventToFirestore(newSuggestion);
+
+                  print('Adding event to Google Calendar: $title, $start - $end, Location: $location');
                   await calendarRepository.addEventToGoogleCalendar(
                     accountId: accountId,
                     title: title,

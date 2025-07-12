@@ -49,7 +49,7 @@ class CalendarRepository {
       try {
         final uri = Uri.parse(
           'https://www.googleapis.com/calendar/v3/calendars/$email/events'
-              '?maxResults=20&orderBy=startTime&singleEvents=true&timeMin=${DateTime.now().add(Duration(days: -7)).toUtc().toIso8601String()}',
+              '?maxResults=200&orderBy=startTime&singleEvents=true&timeMin=${DateTime.now().add(Duration(days: -7)).toUtc().toIso8601String()}',
         );
 
         final response = await http.get(uri, headers: {
@@ -146,6 +146,8 @@ class CalendarRepository {
       },
       body: jsonEncode(body),
     );
+
+    print('CalendarRepository: Response status code: ${response.statusCode}');
 
     if (response.statusCode == 401) {
       // TODO: Implement token refresh if needed
