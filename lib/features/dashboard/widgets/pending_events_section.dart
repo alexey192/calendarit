@@ -54,7 +54,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.deepPurpleAccent, width: 1.6),
+          borderSide: const BorderSide(color:  Color(0xFF0076BC), width: 1.6),
         ),
       ),
     );
