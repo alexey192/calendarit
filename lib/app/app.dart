@@ -16,6 +16,8 @@ import '../screens/gmail_web_redirect_screen.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'custom_theme.dart';
+
 class SmartSchedulerApp extends StatelessWidget {
   const SmartSchedulerApp({super.key});
 
@@ -73,8 +75,8 @@ class SmartSchedulerApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Calendar IT',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       routerConfig: router,
       localizationsDelegates: const [
         // AppLocalizations.delegate,
