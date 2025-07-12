@@ -3,6 +3,8 @@ import 'package:calendarit/models/calendar_event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../calendar_widgets/calendar_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'add_event_dialogue.dart';
 import 'animated_event_card.dart';
 import 'card_wrapper.dart';
@@ -64,8 +66,34 @@ class PendingEventsSection extends StatelessWidget {
                   date: date,
                   location: location,
                   onUpdateStatus: (status) async {
-                    await _updateStatus(event.id, status);
+                    //log event we are updating
+                    print('Updating event ${event.id} status to $status');
+                    print('Event details: $title, $date, $location');
+
+                    if (status == 'accepted') {
+                      final hasValidTitle = event.title.trim().isNotEmpty;
+                      final hasValidStart = event.start != null;
+                      final hasValidEnd = event.end != null;
+
+                      if (hasValidTitle && hasValidStart && hasValidEnd) {
+                        await calendarRepository.addEventToGoogleCalendar(
+                          accountId: accountIds.first,
+                          title: event.title,
+                          startDateTime: event.start!,
+                          endDateTime: event.end!,
+                          location: event.location,
+                        );
+                        await _updateStatus(event.id, 'accepted');
+                        //call update google calendar
+                        context.read<CalendarCubit>().loadEvents();
+                      } else {
+                        _showManualEditDialog(context, event);
+                      }
+                    } else {
+                      await _updateStatus(event.id, status);
+                    }
                   },
+
                   onEdit: () => _showManualEditDialog(context, event),
                 ),
               );
