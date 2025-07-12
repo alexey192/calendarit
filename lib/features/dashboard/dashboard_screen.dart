@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/connected_account.dart';
 import '../auth/auth_cubit.dart';
+import '../../models/calendar_event.dart';
 import 'calendar_widgets/calendar_cubit.dart';
 import 'calendar_widgets/calendar_repository.dart';
 import 'widgets/horizontal_card_carousel.dart';
@@ -184,18 +185,30 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              PendingEventsSection(
-                                calendarRepository: calendarRepository,
-                                accountIds: accountIds,
-                                events: context.watch<CalendarCubit>()
-                                    .events
-                                    .where(
-                                      (event) =>
-                                      event.status == 'pending' &&
-                                          event.start != null &&
-                                          event.end != null
-                                  ,)
-                                    .toList(),
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .collection('events')
+                                    .where('status', isEqualTo: 'pending')
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  }
+
+                                  final docs = snapshot.data?.docs ?? [];
+                                  final events = docs.map((doc) {
+                                    final data = doc.data() as Map<String, dynamic>;
+                                    return CalendarEvent.fromMap(data, doc.id);
+                                  }).toList();
+
+                                  return PendingEventsSection(
+                                    events: events,
+                                    calendarRepository: calendarRepository,
+                                    accountIds: accountIds,
+                                  );
+                                },
                               ),
                               const SizedBox(height: 32),
                               const TodoListSection(),
