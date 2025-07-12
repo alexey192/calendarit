@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../models/connected_account.dart';
 import 'calendar_widgets/calendar_cubit.dart';
@@ -11,7 +10,7 @@ import 'calendar_widgets/calendar_repository.dart';
 import 'widgets/horizontal_card_carousel.dart';
 import 'widgets/pending_events_section.dart';
 import 'widgets/ai_assistant_section.dart';
-import 'calendar_widgets//calendar_section.dart';
+import 'calendar_widgets/calendar_section.dart';
 import 'widgets/dashboard_animations.dart';
 import 'widgets/todo_list_section.dart';
 
@@ -57,13 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                //Color(0xFF103750),
-                Color(0xFF005C96),
-                Color(0xFF0076B8),
-                Color(0xFF54A7D5),
-                Color(0xFF9ECDEC),
-              ],
+              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
             ),
           ),
           child: SafeArea(
@@ -129,7 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 // Greeting (centered)
                                 Positioned(
                                   left: MediaQuery.of(context).size.width / 2 - 60, // adjust -60 if text is too far off
-                                  top: 12,
+                                  top: 20,
                                   child: Text(
                                     'Calendar IT',
                                     style: TextStyle(
@@ -143,11 +136,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 // Settings icon (right)
                                 Positioned(
                                   right: 0,
-                                  top: 0,
+                                  top: 12,
                                   child: IconButton(
                                     icon: const Icon(Icons.settings, color: Colors.white, size: 40),
                                     onPressed: () {
-                                      context.go('/settings');
                                       // Open settings screen or modal
                                     },
                                   ),
@@ -159,6 +151,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       ),
                     ),
 
+
+                    const SizedBox(height: 12),
 
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
