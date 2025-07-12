@@ -126,9 +126,10 @@ class _SignUpScreenState extends State<SignUpScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF6366F1), // Indigo
-              Color(0xFF8B5CF6), // Purple
-              Color(0xFFEC4899), // Pink
+              Color(0xFF005C96),
+              Color(0xFF0076B8),
+              Color(0xFF54A7D5),
+              Color(0xFF9ECDEC),
             ],
           ),
         ),
@@ -311,8 +312,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [
-                                        Color(0xFF6366F1),
-                                        Color(0xFF8B5CF6),
+                                        Color(0xFF0076B8),
+                                        Color(0xFF54A7D5),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(28),
@@ -332,14 +333,14 @@ class _SignUpScreenState extends State<SignUpScreen>
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [
-                                        Color(0xFF6366F1),
-                                        Color(0xFF8B5CF6),
+                                        Color(0xFF0076B8),
+                                        Color(0xFF54A7D5),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(28),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF6366F1).withOpacity(0.3),
+                                        color: const Color(0xFF0076BC).withOpacity(0.3),
                                         blurRadius: 20,
                                         offset: const Offset(0, 10),
                                       ),
@@ -483,7 +484,7 @@ class _SignUpScreenState extends State<SignUpScreen>
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(
-            color: Color(0xFF6366F1),
+            color: Color(0xFF0076BC),
             width: 2,
           ),
         ),

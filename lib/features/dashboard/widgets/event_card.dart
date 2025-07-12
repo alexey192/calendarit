@@ -133,7 +133,7 @@ class EventCard extends StatelessWidget {
                             height: 8,
                             margin: const EdgeInsets.only(bottom: 8),
                             decoration: const BoxDecoration(
-                              color: Color(0xFF6366F1),
+                              color: Color(0xFF0076BC),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -228,7 +228,7 @@ class EventCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        color: const  Color(0xFF0076BC).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -236,7 +236,7 @@ class EventCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF6366F1),
+                          color:  Color(0xFF0076BC),
                         ),
                       ),
                     ),

@@ -12,38 +12,39 @@ class CalendarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    try {
-      return BlocBuilder<CalendarCubit, CalendarState>(
-        builder: (context, state) {
-          if (state is CalendarLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is CalendarError) {
-            return Center(child: Text('Error: ${state.message}', style: const TextStyle(color: Colors.white)));
-          } else if (state is CalendarLoaded) {
-            return CardWrapper(
-              height: 400,
-              child: SfCalendar(
-                view: CalendarView.week,
-                todayHighlightColor: Colors.deepPurpleAccent,
-                headerStyle: const CalendarHeaderStyle(
-                  backgroundColor: Colors.transparent,
-                  textAlign: TextAlign.center,
-                  textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                dataSource: _CalendarDataSource(state.events),
-                showNavigationArrow: true,
-                allowDragAndDrop: false,
-                allowAppointmentResize: false,
+    return BlocBuilder<CalendarCubit, CalendarState>(
+      builder: (context, state) {
+        if (state is CalendarLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is CalendarError) {
+          return Center(child: Text('Error: ${state.message}', style: const TextStyle(color: Colors.white)));
+        } else if (state is CalendarLoaded) {
+          return CardWrapper(
+            height: 400,
+            child: SfCalendar(
+              view: CalendarView.week,
+              todayHighlightColor: Color(0xFF0076BC),
+              cellBorderColor: Color(0xFF103750).withOpacity(0.4),
+              headerStyle: const CalendarHeaderStyle(
+                backgroundColor: Colors.transparent,
+                textAlign: TextAlign.center,
+                textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            );
-          }
-          return const SizedBox(height: 400);
-        },
-      );
-    } catch (e, st) {
-      print('Error in BlocBuilder: $e');
-      return Text('Calendar error');
-    }
+              selectionDecoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.all(color: Color(0xFF0076BC), width: 2),
+              ),
+              dataSource: _CalendarDataSource(state.events),
+              showNavigationArrow: true,
+              //showTodayButton: true,
+              allowDragAndDrop: false,
+              allowAppointmentResize: true,
+            ),
+          );
+        }
+        return const SizedBox(height: 400);
+      },
+    );
   }
 }
 
