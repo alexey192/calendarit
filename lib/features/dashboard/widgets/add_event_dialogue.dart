@@ -103,7 +103,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
   }
 
 
-  final List<String> _categories = ['Work', 'Personal', 'Fitness', 'Health']; //TODO define a list
+  final List<String> _categories = ["Sport", "Music", "Education", "Work", "Health", "Arts & Culture", "Social & Entertainment", "Others"]; //TODO define a list
   String? _selectedCategory;
 
   @override
