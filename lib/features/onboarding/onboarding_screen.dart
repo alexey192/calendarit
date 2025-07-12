@@ -70,13 +70,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
     _pulseAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.05,
+      end: 1.03,
     ).animate(CurvedAnimation(
       parent: _pulseController,
       curve: Curves.easeInOut,
     ));
 
-    // Start animations
     _fadeController.forward();
     Future.delayed(const Duration(milliseconds: 300), () {
       _slideController.forward();
@@ -109,11 +108,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              //Color(0xFF103750),
-              Color(0xFF005C96),
-              Color(0xFF0076B8),
-              Color(0xFF54A7D5),
-              Color(0xFF9ECDEC),
+              Color(0xFF1E40AF),
+              Color(0xFF3B82F6),
+              Color(0xFF60A5FA),
+              Color(0xFF93C5FD),
             ],
           ),
         ),
@@ -122,34 +120,41 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               children: [
-                const Spacer(),
+                const Spacer(flex: 2),
 
-                // Logo and main illustration
+                // Logo
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
                     scale: _scaleAnimation,
                     child: Container(
-                      width: 120,
-                      height: 120,
+                      width: 140,
+                      height: 140,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withOpacity(0.15),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: Colors.white.withOpacity(0.3),
-                          width: 2,
+                          width: 3,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
                       child: const Icon(
                         Icons.calendar_today_rounded,
-                        size: 60,
+                        size: 70,
                         color: Colors.white,
                       ),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 48),
 
                 // App name
                 SlideTransition(
@@ -159,10 +164,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: const Text(
                       'CalendarIT',
                       style: TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 52,
+                        fontWeight: FontWeight.w800,
                         color: Colors.white,
-                        letterSpacing: -1,
+                        letterSpacing: -1.5,
+                        height: 1.1,
                       ),
                     ),
                   ),
@@ -176,12 +182,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: FadeTransition(
                     opacity: _fadeAnimation,
                     child: Text(
-                      'AI-Powered Email to Calendar',
+                      'AI-powered calendar designed to\nkeep your events and deadlines on track',
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white.withOpacity(0.9),
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w400,
+                        height: 1.4,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
@@ -193,31 +201,39 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   position: _slideAnimation,
                   child: FadeTransition(
                     opacity: _fadeAnimation,
-                    child: Column(
-                      children: [
-                        _buildFeatureItem(
-                          Icons.email_rounded,
-                          'Smart Email Detection',
-                          'Automatically finds events in your emails',
-                        ),
-                        const SizedBox(height: 24),
-                        _buildFeatureItem(
-                          Icons.psychology_rounded,
-                          'AI Assistant',
-                          'Intelligent event parsing and suggestions',
-                        ),
-                        const SizedBox(height: 24),
-                        _buildFeatureItem(
-                          Icons.event_available_rounded,
-                          'Seamless Calendar Sync',
-                          'One-tap confirmation to add events',
-                        ),
-                      ],
+                    child: Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 20,
+                        runSpacing: 20,
+                        children: [
+                          _buildFeatureItem(
+                            Icons.auto_fix_high_rounded,
+                            'AI Email Analysis',
+                            'AI reads and extracts the events from your emails',
+                          ),
+                          _buildFeatureItem(
+                            Icons.location_on_outlined,
+                            'AI Context Detection',
+                            'AI identifies dates, times, and locations intelligently',
+                          ),
+                          _buildFeatureItem(
+                            Icons.chat_bubble_outline_rounded,
+                            'AI Conversation',
+                            'Chat with AI Assistant to create the events naturally',
+                          ),
+                          _buildFeatureItem(
+                            Icons.image_search_rounded,
+                            'AI Vision Processing',
+                            'Use AI to extract event details from images and flyers',
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
 
-                const Spacer(),
+                const Spacer(flex: 3),
 
                 // Get Started Button
                 AnimatedBuilder(
@@ -227,20 +243,25 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       scale: _pulseAnimation.value,
                       child: Container(
                         width: double.infinity,
-                        height: 56,
+                        height: 64,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [
                               Color(0xFFFFFFFF),
-                              Color(0xFFF8FAFC),
+                              Color(0xFFF1F5F9),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(28),
+                          borderRadius: BorderRadius.circular(32),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.1),
+                              blurRadius: 1,
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
@@ -250,14 +271,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             backgroundColor: Colors.transparent,
                             shadowColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
+                              borderRadius: BorderRadius.circular(32),
                             ),
                           ),
                           child: const Text(
                             'Get Started',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
                               color: Color(0xFF1F2937),
                             ),
                           ),
@@ -267,22 +288,23 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   },
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
 
                 // Privacy note
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: Text(
-                    'Your privacy is our priority. All data is encrypted.',
+                    'Powered by AI • Privacy first • End-to-end encryption',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.white.withOpacity(0.7),
+                      fontWeight: FontWeight.w400,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -292,50 +314,81 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   Widget _buildFeatureItem(IconData icon, String title, String description) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.3),
-              width: 1,
+    return Container(
+      width: 290,
+      height: 254,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF3B82F6),
+                    Color(0xFF1D4ED8),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF3B82F6).withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 36,
+              ),
             ),
-          ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+            const SizedBox(height: 28),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1F2937),
+                height: 1.2,
               ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white.withOpacity(0.8),
-                ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              description,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Color(0xFF6B7280),
+                height: 1.5,
+                fontWeight: FontWeight.w500,
               ),
-            ],
-          ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
