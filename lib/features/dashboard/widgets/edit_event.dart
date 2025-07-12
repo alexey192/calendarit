@@ -46,7 +46,10 @@ class _EditEventDialogState extends State<EditEventDialog> {
         labelText: label,
         labelStyle: const TextStyle(fontWeight: FontWeight.w500),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF0076BC), width: 1.6),
+        ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color:  Color(0xFF0076BC), width: 1.6),

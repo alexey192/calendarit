@@ -24,13 +24,19 @@ class CalendarSection extends StatelessWidget {
             child: SfCalendar(
               view: CalendarView.week,
               todayHighlightColor: Color(0xFF0076BC),
+              cellBorderColor: Color(0xFF103750).withOpacity(0.4),
               headerStyle: const CalendarHeaderStyle(
                 backgroundColor: Colors.transparent,
                 textAlign: TextAlign.center,
                 textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+              selectionDecoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.all(color: Color(0xFF0076BC), width: 2),
+              ),
               dataSource: _CalendarDataSource(state.events),
               showNavigationArrow: true,
+              //showTodayButton: true,
               allowDragAndDrop: false,
               allowAppointmentResize: true,
             ),
