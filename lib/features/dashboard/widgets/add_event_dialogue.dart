@@ -26,6 +26,8 @@ class AddEventDialog extends StatefulWidget {
 class _AddEventDialogState extends State<AddEventDialog> {
   late final TextEditingController _titleController;
   late final TextEditingController _locationController;
+  late final TextEditingController _descriptionController;
+
   DateTime? _start;
   DateTime? _end;
   String? _selectedAccountId;
@@ -35,6 +37,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
     super.initState();
     _titleController = TextEditingController(text: widget.eventData['title'] ?? '');
     _locationController = TextEditingController(text: widget.eventData['location'] ?? '');
+    _descriptionController = TextEditingController(text: widget.eventData['description'] ?? '');
     _start = widget.eventData['start'] is DateTime ? widget.eventData['start'] : null;
     _end = widget.eventData['end'] is DateTime ? widget.eventData['end'] : null;
     _selectedAccountId = widget.accountIds.isNotEmpty ? widget.accountIds.first : null;
@@ -44,13 +47,14 @@ class _AddEventDialogState extends State<AddEventDialog> {
   void dispose() {
     _titleController.dispose();
     _locationController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
   Future<void> _pickDateTime({required bool isStart}) async {
     final date = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: isStart ? (_start ?? DateTime.now()) : (_end ?? DateTime.now()),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -58,7 +62,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
 
     final time = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: TimeOfDay.fromDateTime(isStart ? (_start ?? DateTime.now()) : (_end ?? DateTime.now())),
     );
     if (time == null) return;
 
@@ -151,40 +155,47 @@ class _AddEventDialogState extends State<AddEventDialog> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Start time
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _start == null
-                              ? 'Start: Not set'
-                              : 'Start: ${DateFormat.yMd().add_Hm().format(_start!)}',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => _pickDateTime(isStart: true),
-                        child: const Text('Pick'),
-                      ),
-                    ],
+                  // Description (optional)
+                  TextFormField(
+                    controller: _descriptionController,
+                    maxLines: 3,
+                    decoration: _inputDecoration('Description (optional)'),
                   ),
+                  const SizedBox(height: 12),
+
+                  // Start time
+                  TextFormField(
+                    readOnly: true,
+                    onTap: () => _pickDateTime(isStart: true),
+                    decoration: _inputDecoration('Start').copyWith(
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today, size: 20),
+                        onPressed: () => _pickDateTime(isStart: true),
+                        splashRadius: 20,
+                      ),
+                      hintText: 'Not set',
+                    ),
+                    controller: TextEditingController(
+                      text: _start == null ? '' : DateFormat.yMd().add_Hm().format(_start!),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
 
                   // End time
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _end == null
-                              ? 'End: Not set'
-                              : 'End: ${DateFormat.yMd().add_Hm().format(_end!)}',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      TextButton(
+                  TextFormField(
+                    readOnly: true,
+                    onTap: () => _pickDateTime(isStart: false),
+                    decoration: _inputDecoration('End').copyWith(
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today, size: 20),
                         onPressed: () => _pickDateTime(isStart: false),
-                        child: const Text('Pick'),
+                        splashRadius: 20,
                       ),
-                    ],
+                      hintText: 'Not set',
+                    ),
+                    controller: TextEditingController(
+                      text: _end == null ? '' : DateFormat.yMd().add_Hm().format(_end!),
+                    ),
                   ),
                   const SizedBox(height: 24),
 
