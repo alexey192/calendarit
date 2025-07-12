@@ -33,7 +33,7 @@ class PendingEventsSection extends StatelessWidget {
               .collection('events')
               .where('status', isEqualTo: 'pending')
               .orderBy('createdAt', descending: true)
-              .limit(5)
+              .limit(10)
               .snapshots(),
           builder: (context, snapshot) {
             final docs = snapshot.data?.docs ?? [];

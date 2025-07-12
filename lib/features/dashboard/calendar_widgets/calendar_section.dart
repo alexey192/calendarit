@@ -12,33 +12,38 @@ class CalendarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CalendarCubit, CalendarState>(
-      builder: (context, state) {
-        if (state is CalendarLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is CalendarError) {
-          return Center(child: Text('Error: ${state.message}', style: const TextStyle(color: Colors.white)));
-        } else if (state is CalendarLoaded) {
-          return CardWrapper(
-            height: 400,
-            child: SfCalendar(
-              view: CalendarView.week,
-              todayHighlightColor: Colors.deepPurpleAccent,
-              headerStyle: const CalendarHeaderStyle(
-                backgroundColor: Colors.transparent,
-                textAlign: TextAlign.center,
-                textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    try {
+      return BlocBuilder<CalendarCubit, CalendarState>(
+        builder: (context, state) {
+          if (state is CalendarLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is CalendarError) {
+            return Center(child: Text('Error: ${state.message}', style: const TextStyle(color: Colors.white)));
+          } else if (state is CalendarLoaded) {
+            return CardWrapper(
+              height: 400,
+              child: SfCalendar(
+                view: CalendarView.week,
+                todayHighlightColor: Colors.deepPurpleAccent,
+                headerStyle: const CalendarHeaderStyle(
+                  backgroundColor: Colors.transparent,
+                  textAlign: TextAlign.center,
+                  textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                dataSource: _CalendarDataSource(state.events),
+                showNavigationArrow: true,
+                allowDragAndDrop: false,
+                allowAppointmentResize: false,
               ),
-              dataSource: _CalendarDataSource(state.events),
-              showNavigationArrow: true,
-              allowDragAndDrop: false,
-              allowAppointmentResize: true,
-            ),
-          );
-        }
-        return const SizedBox(height: 400);
-      },
-    );
+            );
+          }
+          return const SizedBox(height: 400);
+        },
+      );
+    } catch (e, st) {
+      print('Error in BlocBuilder: $e');
+      return Text('Calendar error');
+    }
   }
 }
 

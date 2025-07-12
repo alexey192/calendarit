@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/dashboard/calendar_widgets/calendar_cubit.dart';
+import '../features/dashboard/calendar_widgets/calendar_repository.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/auth/sign_in_screen.dart';
 import '../features/auth/sign_up_screen.dart';
@@ -33,8 +36,15 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: '/dashboard',
-      builder: (context, state) => const DashboardScreen(),
+      builder: (context, state) => DashboardScreen(),
     ),
+    /*GoRoute(
+      path: '/dashboard',
+      builder: (context, state) => BlocProvider(
+        create: (_) => CalendarCubit(CalendarRepository())..loadEvents(),
+        child: DashboardScreen(),
+      ),
+    ),*/
     GoRoute(
       path: '/event/:id',
       builder: (context, state) {
@@ -53,10 +63,6 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/oauth2redirect',
       builder: (context, state) => const GmailWebRedirectScreen(),
-    ),
-    GoRoute(
-      path: '/dashboard',
-      builder: (context, state) => const DashboardScreen(),
     ),
   ],
 );
