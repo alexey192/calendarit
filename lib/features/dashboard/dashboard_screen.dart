@@ -63,8 +63,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 Color(0xFF0076B8),
                 Color(0xFF54A7D5),
                 Color(0xFF9ECDEC),
-                // Color(0xFF0076BC),
-                // Color(0xFF0076BC),
               ],
             ),
           ),
