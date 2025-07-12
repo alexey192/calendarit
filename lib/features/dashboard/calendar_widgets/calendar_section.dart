@@ -23,7 +23,7 @@ class CalendarSection extends StatelessWidget {
             height: 400,
             child: SfCalendar(
               view: CalendarView.week,
-              todayHighlightColor: Colors.deepPurpleAccent,
+              todayHighlightColor: Color(0xFF0076BC),
               headerStyle: const CalendarHeaderStyle(
                 backgroundColor: Colors.transparent,
                 textAlign: TextAlign.center,

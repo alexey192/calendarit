@@ -116,7 +116,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
                     child: ElevatedButton(
                       onPressed: _saveChanges,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurpleAccent,
+                        backgroundColor: Color(0xFF9ECDEC),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -124,7 +124,7 @@ class _EditEventDialogState extends State<EditEventDialog> {
                       ),
                       child: const Text(
                         'Save Changes',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
                       ),
                     ),
                   ),

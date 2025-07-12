@@ -103,8 +103,8 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
                       inputBorderRadius: BorderRadius.all(Radius.circular(16)),
                       inputTextStyle: TextStyle(fontSize: 16),
                       backgroundColor: Colors.transparent,
-                      primaryColor: Color(0xFF8B5CF6),
-                      secondaryColor: Color(0xFFEDE9FE),
+                      primaryColor: Color(0xFF0076BC),
+                      secondaryColor: Color(0xFF9ECDEC),
                       receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
                       sentMessageBodyTextStyle: TextStyle(color: Colors.white),
                     ),
@@ -145,7 +145,7 @@ class _ActionButtons extends StatelessWidget {
         children: [
           _roundButton(
             icon: Icons.image,
-            color: const Color(0xFF8B5CF6),
+            color: const Color(0xFF0076BC),
             onPressed: () {
               // TODO: AI from image
             },
@@ -174,8 +174,8 @@ class _ActionButtons extends StatelessWidget {
         elevation: 6,
       ),
       child: SizedBox(
-        width: 64,
-        height: 64,
+        width: 48,
+        height: 48,
         child: Icon(icon, size: 32, color: Colors.white),
       ),
     );

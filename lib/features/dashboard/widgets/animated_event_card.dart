@@ -96,10 +96,10 @@ class _AnimatedEventCardState extends State<AnimatedEventCard>
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.1),
+            color: Color(0xFF9ECDEC).withOpacity(0.3),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey.withOpacity(0.2),
+              color: Color(0xFF9ECDEC).withOpacity(0),
               width: 1,
             ),
           ),

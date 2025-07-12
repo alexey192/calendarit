@@ -89,16 +89,16 @@ class _TodoListSectionState extends State<TodoListSection> {
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(color: Colors.deepPurple, width: 1.2),
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF0076BC), width: 1.2),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(color: Colors.deepPurple, width: 1.2),
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF0076BC), width: 1.2),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(color: Colors.deepPurple, width: 2.0),
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF0076BC), width: 2.0),
                         ),
                       ),
                     ),
@@ -109,7 +109,7 @@ class _TodoListSectionState extends State<TodoListSection> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF8B5CF6),
+                        color: Color(0xFF0076BC),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.add, color: Colors.white),
@@ -133,9 +133,9 @@ class _TodoListSectionState extends State<TodoListSection> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), // smaller padding
                       decoration: BoxDecoration(
                         color: todo.isDone
-                            ? Colors.greenAccent.withOpacity(0.3)
-                            : Colors.black12,// const Color(0xFFEDE9FE),
-                        borderRadius: BorderRadius.circular(32),
+                            ? Color(0xFF059669).withOpacity(0.1)//Colors.greenAccent.withOpacity(0.3)
+                            : Color(0xFF9ECDEC).withOpacity(0.3),// const Color(0xFFEDE9FE),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
@@ -145,7 +145,7 @@ class _TodoListSectionState extends State<TodoListSection> {
                               todo.isDone
                                   ? Icons.check_circle
                                   : Icons.radio_button_unchecked,
-                              color: todo.isDone ? Colors.green : Colors.grey,
+                              color: todo.isDone ? Color(0xFF059669).withOpacity(1) : Color(0xFF0076B8),
                             ),
                           ),
                           const SizedBox(width: 12),
