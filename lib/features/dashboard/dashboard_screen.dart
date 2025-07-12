@@ -131,13 +131,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 ),
                                 Positioned(
                                   left: MediaQuery.of(context).size.width / 2 - 60,
-                                  top: 20,
-                                  child: Text(
-                                    'Calendar IT',
-                                    style: TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white.withOpacity(0.9),
+                                  top: -55,
+                                  child: SizedBox(
+                                    width: 200,  // adjust width & height to your logo size
+                                    height: 200,
+                                    child: Image.asset(
+                                      'icons/logo.png', //TODO change logo
+                                      fit: BoxFit.contain,
+                                      color: Colors.white.withOpacity(0.9), // optional: tint if logo is monochrome and you want it white
                                     ),
                                   ),
                                 ),
