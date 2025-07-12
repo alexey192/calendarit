@@ -104,7 +104,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
                     child: ElevatedButton(
                       onPressed: _saveEvent,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:  Color(0xFF0076BC),
+                        backgroundColor:  Color(0xFF9ECDEC),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
