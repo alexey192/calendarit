@@ -1,3 +1,4 @@
+import 'package:calendarit/models/calendar_event.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'calendar_state.dart';
@@ -18,6 +19,14 @@ class CalendarCubit extends Cubit<CalendarState> {
       debugPrintStack(stackTrace: stack);
       emit(CalendarError('Failed to load calendar events'));
     }
+  }
+
+  List<CalendarEvent> get events {
+    final currentState = state;
+    if (currentState is CalendarLoaded) {
+      return currentState.events;
+    }
+    return [];
   }
 
 }

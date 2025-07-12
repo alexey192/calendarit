@@ -23,13 +23,27 @@ class CalendarSection extends StatelessWidget {
             height: 400,
             child: SfCalendar(
               view: CalendarView.week,
-              todayHighlightColor: Color(0xFF0076BC),
-              cellBorderColor: Color(0xFF103750).withOpacity(0.4),
+              viewHeaderStyle: ViewHeaderStyle(
+                backgroundColor: Colors.transparent,
+                dateTextStyle: TextStyle(color: Colors.black87),
+                dayTextStyle: TextStyle(color: Colors.black87),
+              ),
+
+              timeSlotViewSettings: TimeSlotViewSettings(
+                timeTextStyle: TextStyle(color: Colors.black87),
+              ),
+
               headerStyle: const CalendarHeaderStyle(
                 backgroundColor: Colors.transparent,
                 textAlign: TextAlign.center,
-                textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
+              todayHighlightColor: Color(0xFF0076BC),
+              cellBorderColor: Color(0xFF103750).withOpacity(0.4),
               selectionDecoration: BoxDecoration(
                 color: Colors.transparent,
                 border: Border.all(color: Color(0xFF0076BC), width: 2),
@@ -54,9 +68,14 @@ class _CalendarDataSource extends CalendarDataSource {
   }
 
   @override
-  DateTime getStartTime(int index) => appointments![index].startTime;
+  DateTime getStartTime(int index) =>
+      (appointments![index] as CalendarEvent).start ?? DateTime.now();
+
   @override
-  DateTime getEndTime(int index) => appointments![index].endTime;
+  DateTime getEndTime(int index) =>
+      (appointments![index] as CalendarEvent).end ?? DateTime.now().add(const Duration(hours: 1));
+
   @override
-  String getSubject(int index) => appointments![index].title;
+  String getSubject(int index) =>
+      (appointments![index] as CalendarEvent).title;
 }

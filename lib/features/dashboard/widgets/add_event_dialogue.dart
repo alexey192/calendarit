@@ -1,127 +1,189 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class AddEventDialog extends StatefulWidget {
-  const AddEventDialog({super.key});
+  final Map<String, dynamic> eventData;
+  final List<String> accountIds;
+  final void Function({
+  required String accountId,
+  required String title,
+  required DateTime start,
+  required DateTime end,
+  String? location,
+  }) onConfirm;
+
+  const AddEventDialog({
+    super.key,
+    required this.eventData,
+    required this.accountIds,
+    required this.onConfirm,
+  });
 
   @override
   State<AddEventDialog> createState() => _AddEventDialogState();
 }
 
 class _AddEventDialogState extends State<AddEventDialog> {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController dateController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController tagController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _locationController;
+
+  DateTime? _start;
+  DateTime? _end;
+  String? _selectedAccountId;
 
   @override
-  void dispose() {
-    titleController.dispose();
-    locationController.dispose();
-    dateController.dispose();
-    descriptionController.dispose();
-    tagController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.eventData['title'] ?? '');
+    _locationController = TextEditingController(text: widget.eventData['location'] ?? '');
+
+    _start = widget.eventData['start'] is DateTime
+        ? widget.eventData['start']
+        : null;
+    _end = widget.eventData['end'] is DateTime
+        ? widget.eventData['end']
+        : null;
+
+    _selectedAccountId = widget.accountIds.isNotEmpty ? widget.accountIds.first : null;
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {int maxLines = 1}) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w500),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF0076BC), width: 1.6),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF0076BC), width: 1.6),
-        ),
-      ),
+  Future<void> _pickDateTime({required bool isStart}) async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
     );
-  }
+    if (date == null) return;
 
-  Future<void> _saveEvent() async {
-    await FirebaseFirestore.instance.collection('events').add({
-      'title': titleController.text.trim(),
-      'location': locationController.text.trim(),
-      'date': dateController.text.trim(),
-      'description': descriptionController.text.trim(),
-      'tag': tagController.text.trim(),
-      'status': 'accepted',
-      'createdAt': FieldValue.serverTimestamp(),
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (time == null) return;
+
+    final dateTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    setState(() {
+      if (isStart) {
+        _start = dateTime;
+      } else {
+        _end = dateTime;
+      }
     });
-
-    if (mounted) Navigator.of(context).pop();
   }
+
+  bool get _isValid =>
+      _titleController.text.trim().isNotEmpty &&
+          _start != null &&
+          _end != null &&
+          _selectedAccountId != null &&
+          _start!.isBefore(_end!);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
-        child: Material(
-          borderRadius: BorderRadius.circular(20),
-          clipBehavior: Clip.antiAlias,
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Add New Event',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField('Title', titleController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Location', locationController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Date & Time', dateController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Description', descriptionController, maxLines: 3),
-                  const SizedBox(height: 12),
-                  _buildTextField('Tag', tagController),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _saveEvent,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:  Color(0xFF9ECDEC),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        'Save Event',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    return AlertDialog(
+      title: const Text('Add to Google Calendar'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField<String>(
+              value: _selectedAccountId,
+              onChanged: (value) => setState(() => _selectedAccountId = value),
+              items: widget.accountIds
+                  .map((id) => DropdownMenuItem(value: id, child: Text(id)))
+                  .toList(),
+              decoration: const InputDecoration(labelText: 'Google Account'),
             ),
-          ),
+            TextFormField(
+              controller: _titleController,
+              decoration: const InputDecoration(labelText: 'Title'),
+            ),
+            TextFormField(
+              controller: _locationController,
+              decoration: const InputDecoration(labelText: 'Location (optional)'),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(_start == null
+                      ? 'Start: Not set'
+                      : 'Start: ${DateFormat.yMd().add_Hm().format(_start!)}'),
+                ),
+                TextButton(
+                  onPressed: () => _pickDateTime(isStart: true),
+                  child: const Text('Pick'),
+                )
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(_end == null
+                      ? 'End: Not set'
+                      : 'End: ${DateFormat.yMd().add_Hm().format(_end!)}'),
+                ),
+                TextButton(
+                  onPressed: () => _pickDateTime(isStart: false),
+                  child: const Text('Pick'),
+                )
+              ],
+            ),
+          ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: _isValid
+              ? () {
+            widget.onConfirm(
+              accountId: _selectedAccountId!,
+              title: _titleController.text.trim(),
+              start: _start!,
+              end: _end!,
+              location: _locationController.text.trim().isEmpty
+                  ? null
+                  : _locationController.text.trim(),
+            );
+            Navigator.pop(context);
+          }
+              : null,
+          child: const Text('Add'),
+        ),
+      ],
     );
   }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
+}
+
+Future<void> showAddEventDialog({
+  required BuildContext context,
+  required Map<String, dynamic> eventData,
+  required List<String> accountIds,
+  required void Function({
+  required String accountId,
+  required String title,
+  required DateTime start,
+  required DateTime end,
+  String? location,
+  }) onConfirm,
+}) async {
+  await showDialog(
+    context: context,
+    builder: (ctx) => AddEventDialog(
+      eventData: eventData,
+      accountIds: accountIds,
+      onConfirm: onConfirm,
+    ),
+  );
 }

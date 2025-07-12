@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/connected_account.dart';
+import '../auth/auth_cubit.dart';
 import 'calendar_widgets/calendar_cubit.dart';
 import 'calendar_widgets/calendar_repository.dart';
 import 'widgets/horizontal_card_carousel.dart';
@@ -23,6 +24,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
   late DashboardAnimations _animations;
+  final calendarRepository = CalendarRepository();
 
   @override
   void initState() {
@@ -40,14 +42,18 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final authState = context.watch<AuthCubit>().state;
+
     if (user == null) {
       return const Scaffold(
         body: Center(child: Text("User not logged in")),
       );
     }
 
+    final accountIds = authState is AuthSuccess ? authState.accountIds : <String>[];
+
     return BlocProvider(
-      create: (_) => CalendarCubit(CalendarRepository())..loadEvents(),
+      create: (_) => CalendarCubit(calendarRepository)..loadEvents(),
       child: Scaffold(
         body: Container(
           width: double.infinity,
@@ -80,11 +86,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           child: SizedBox(
-                            height: 60, // adjust height if needed
+                            height: 60,
                             width: double.infinity,
                             child: Stack(
                               children: [
-                                // Gmail Connections (left side)
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: SizedBox(
@@ -123,10 +128,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                     ),
                                   ),
                                 ),
-
-                                // Greeting (centered)
                                 Positioned(
-                                  left: MediaQuery.of(context).size.width / 2 - 60, // adjust -60 if text is too far off
+                                  left: MediaQuery.of(context).size.width / 2 - 60,
                                   top: 20,
                                   child: Text(
                                     'Calendar IT',
@@ -137,16 +140,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                     ),
                                   ),
                                 ),
-
-                                // Settings icon (right)
                                 Positioned(
                                   right: 0,
                                   top: 12,
                                   child: IconButton(
                                     icon: const Icon(Icons.settings, color: Colors.white, size: 40),
-                                    onPressed: () {
-                                      // Open settings screen or modal
-                                    },
+                                    onPressed: () {},
                                   ),
                                 ),
                               ],
@@ -155,10 +154,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                         ),
                       ),
                     ),
-
-
                     const SizedBox(height: 12),
-
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -183,15 +179,26 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           ),
                         ),
                         const SizedBox(width: 16),
-                        const Expanded(
+                        Expanded(
                           flex: 1,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              const SizedBox(width: 16),
-                              PendingEventsSection(),
-                              SizedBox(height: 32),
-                              TodoListSection(),
+                            children: [
+                              PendingEventsSection(
+                                calendarRepository: calendarRepository,
+                                accountIds: accountIds,
+                                events: context.watch<CalendarCubit>()
+                                    .events
+                                    .where(
+                                      (event) =>
+                                      event.status == 'pending' &&
+                                          event.start != null &&
+                                          event.end != null
+                                  ,)
+                                    .toList(),
+                              ),
+                              const SizedBox(height: 32),
+                              const TodoListSection(),
                             ],
                           ),
                         ),

@@ -49,7 +49,7 @@ class CalendarRepository {
       try {
         final uri = Uri.parse(
           'https://www.googleapis.com/calendar/v3/calendars/$email/events'
-              '?maxResults=20&orderBy=startTime&singleEvents=true&timeMin=${DateTime.now().toUtc().toIso8601String()}',
+              '?maxResults=20&orderBy=startTime&singleEvents=true&timeMin=${DateTime.now().add(Duration(days: -7)).toUtc().toIso8601String()}',
         );
 
         final response = await http.get(uri, headers: {
@@ -68,8 +68,8 @@ class CalendarRepository {
           allEvents.add(CalendarEvent(
             id: item['id'],
             title: item['summary'] ?? 'No Title',
-            startTime: DateTime.parse(start).toLocal(),
-            endTime: DateTime.parse(end).toLocal(),
+            start: DateTime.parse(start).toLocal(),
+            end: DateTime.parse(end).toLocal(),
           ));
         }
       } catch (_) {
@@ -77,7 +77,8 @@ class CalendarRepository {
       }
     }
 
-    allEvents.sort((a, b) => a.startTime.compareTo(b.startTime));
+    //allEvents.sort((a, b) => a.start.compareTo(b.start));
+    allEvents.sort((a, b) => b.start!.compareTo(a.start!));
     return allEvents;
   }
 
@@ -99,4 +100,61 @@ class CalendarRepository {
       return null;
     }
   }
+
+  Future<void> addEventToGoogleCalendar({
+    required String accountId,
+    required String title,
+    required DateTime startDateTime,
+    required DateTime endDateTime,
+    String? location,
+  }) async {
+    // Fetch the latest tokens from Firestore
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('gmailAccounts')
+        .doc(accountId)
+        .get();
+
+    final data = doc.data();
+    if (data == null || data['accessToken'] == null) {
+      throw Exception('Missing access token for $accountId');
+    }
+
+    final accessToken = data['accessToken'];
+
+    final url = Uri.parse('https://www.googleapis.com/calendar/v3/calendars/primary/events');
+    final body = {
+      'summary': title,
+      'start': {
+        'dateTime': startDateTime.toUtc().toIso8601String(),
+        'timeZone': 'UTC',
+      },
+      'end': {
+        'dateTime': endDateTime.toUtc().toIso8601String(),
+        'timeZone': 'UTC',
+      },
+      if (location != null && location.trim().isNotEmpty)
+        'location': location.trim(),
+    };
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 401) {
+      // TODO: Implement token refresh if needed
+      throw Exception('Unauthorized – token may have expired.');
+    } else if (response.statusCode >= 400) {
+      throw Exception('Google Calendar API error: ${response.body}');
+    }
+
+    // Successfully added
+  }
 }
+

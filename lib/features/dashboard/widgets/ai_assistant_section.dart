@@ -1,8 +1,11 @@
 import 'dart:math';
+import 'package:calendarit/features/dashboard/calendar_widgets/calendar_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import '../../auth/auth_cubit.dart';
 import '../widgets/card_wrapper.dart';
 import 'add_event_dialogue.dart';
 
@@ -15,6 +18,7 @@ class AIAssistantSection extends StatefulWidget {
 
 class _AIAssistantSectionState extends State<AIAssistantSection> {
   final types.User _user = const types.User(id: 'user-1');
+
   final List<types.Message> _messages = [
     types.TextMessage(
       author: types.User(id: 'assistant', firstName: 'AI Assistant'),
@@ -116,7 +120,10 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
             const SizedBox(width: 12),
             Flexible(
               flex: 10,
-              child: _ActionButtons(),
+              child: _ActionButtons(
+                calendarRepository: context.read<CalendarRepository>(),
+                accountIds: context.read<AuthCubit>().accountIds,
+              ),
             ),
           ],
         ),
@@ -126,6 +133,15 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
 }
 
 class _ActionButtons extends StatelessWidget {
+  final CalendarRepository calendarRepository;
+  final List<String> accountIds;
+
+  const _ActionButtons({
+    super.key,
+    required this.calendarRepository,
+    required this.accountIds,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -156,9 +172,25 @@ class _ActionButtons extends StatelessWidget {
             icon: Icons.add_circle_outline,
             color: const Color(0xFF059669),
             onPressed: () {
-              showDialog(
+              showAddEventDialog(
                 context: context,
-                builder: (context) => const AddEventDialog(),
+                eventData: {}, // Empty for manual entry
+                accountIds: accountIds,
+                onConfirm: ({
+                  required String accountId,
+                  required String title,
+                  required DateTime start,
+                  required DateTime end,
+                  String? location,
+                }) async {
+                  await calendarRepository.addEventToGoogleCalendar(
+                    accountId: accountId,
+                    title: title,
+                    startDateTime: start,
+                    endDateTime: end,
+                    location: location,
+                  );
+                },
               );
             },
           ),
@@ -167,7 +199,11 @@ class _ActionButtons extends StatelessWidget {
     );
   }
 
-  Widget _roundButton({required IconData icon, required Color color, required VoidCallback onPressed}) {
+  Widget _roundButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(

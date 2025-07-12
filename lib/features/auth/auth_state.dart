@@ -7,7 +7,11 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class AuthSuccess extends AuthState {}
+class AuthSuccess extends AuthState {
+  final List<String> accountIds;
+
+  AuthSuccess({required this.accountIds});
+}
 
 class AuthFailure extends AuthState {
   final String message;

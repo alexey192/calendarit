@@ -17,8 +17,21 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signIn(String email, String password) async {
     emit(AuthLoading());
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      emit(AuthSuccess());
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final uid = credential.user!.uid;
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('gmailAccounts')
+          .get();
+
+      final accountIds = snapshot.docs.map((doc) => doc.id).toList();
+
+      emit(AuthSuccess(accountIds: accountIds));
     } on FirebaseAuthException catch (e) {
       emit(AuthFailure(e.message ?? 'Sign-in failed.'));
     }
@@ -44,14 +57,13 @@ class AuthCubit extends Cubit<AuthState> {
           .doc(uid)
           .set(newUser.toMap());
 
-      emit(AuthSuccess());
+      emit(AuthSuccess(accountIds: []));
     } on FirebaseAuthException catch (e) {
       emit(AuthFailure(e.message ?? 'Sign-up failed.'));
     } catch (e) {
       emit(AuthFailure('Unexpected error: $e'));
     }
   }
-
 
   Future<void> sendPasswordReset(String email) async {
     emit(AuthLoading());
@@ -66,5 +78,13 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signOut() async {
     await _auth.signOut();
     emit(AuthInitial());
+  }
+
+  List<String> get accountIds {
+    final currentState = state;
+    if (currentState is AuthSuccess) {
+      return currentState.accountIds;
+    }
+    return [];
   }
 }
