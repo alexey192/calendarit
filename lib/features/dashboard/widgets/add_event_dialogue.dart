@@ -84,29 +84,39 @@ class _AddEventDialogState extends State<AddEventDialog> {
           _start!.isBefore(_end!);
 
   InputDecoration _inputDecoration(String label) {
+    final theme = Theme.of(context);
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+      labelStyle: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF0076BC), width: 1.6),
+        borderSide: BorderSide(
+          color: theme.colorScheme.primary,
+          width: 1.6,
+        ),
       ),
     );
   }
 
+
+  final List<String> _categories = ['Work', 'Personal', 'Fitness', 'Health']; //TODO define a list
+  String? _selectedCategory;
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
         child: Material(
           borderRadius: BorderRadius.circular(20),
           clipBehavior: Clip.antiAlias,
-          color: Colors.white,
+          color: theme.dialogBackgroundColor,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             child: SingleChildScrollView(
@@ -118,12 +128,12 @@ class _AddEventDialogState extends State<AddEventDialog> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Add to Google Calendar',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close),
+                        icon: Icon(Icons.close, color: theme.iconTheme.color),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],
@@ -155,7 +165,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Description (optional)
+                  // Description
                   TextFormField(
                     controller: _descriptionController,
                     maxLines: 3,
@@ -163,13 +173,13 @@ class _AddEventDialogState extends State<AddEventDialog> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Start time
+                  // Start
                   TextFormField(
                     readOnly: true,
                     onTap: () => _pickDateTime(isStart: true),
                     decoration: _inputDecoration('Start').copyWith(
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.calendar_today, size: 20),
+                        icon: Icon(Icons.calendar_today, size: 20, color: theme.iconTheme.color),
                         onPressed: () => _pickDateTime(isStart: true),
                         splashRadius: 20,
                       ),
@@ -181,13 +191,13 @@ class _AddEventDialogState extends State<AddEventDialog> {
                   ),
                   const SizedBox(height: 12),
 
-                  // End time
+                  // End
                   TextFormField(
                     readOnly: true,
                     onTap: () => _pickDateTime(isStart: false),
                     decoration: _inputDecoration('End').copyWith(
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.calendar_today, size: 20),
+                        icon: Icon(Icons.calendar_today, size: 20, color: theme.iconTheme.color),
                         onPressed: () => _pickDateTime(isStart: false),
                         splashRadius: 20,
                       ),
@@ -197,9 +207,26 @@ class _AddEventDialogState extends State<AddEventDialog> {
                       text: _end == null ? '' : DateFormat.yMd().add_Hm().format(_end!),
                     ),
                   ),
+                  const SizedBox(height: 12),
+
+                  // Category
+                  DropdownButtonFormField<String>(
+                    value: _selectedCategory,
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _selectedCategory = value);
+                      }
+                    },
+                    items: _categories
+                        .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+                        .toList(),
+                    decoration: _inputDecoration('Category'),
+                  ),
                   const SizedBox(height: 24),
 
-                  // Submit button
+
+
+                  // Submit
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -218,15 +245,18 @@ class _AddEventDialogState extends State<AddEventDialog> {
                       }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF9ECDEC),
+                        backgroundColor: theme.colorScheme.primary.withOpacity(0.3),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Add',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: theme.textTheme.bodyLarge?.color,
+                        ),
                       ),
                     ),
                   ),
@@ -239,6 +269,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
     );
   }
 }
+
 
 Future<void> showAddEventDialog({
   required BuildContext context,

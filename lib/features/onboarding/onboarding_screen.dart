@@ -118,200 +118,205 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              children: [
-                const Spacer(flex: 2),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 32),
 
-                // Logo
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Container(
-                      width: 140,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 3,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.calendar_today_rounded,
-                        size: 70,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 48),
-
-                // App name
-                SlideTransition(
-                  position: _slideAnimation,
-                  child: FadeTransition(
+                  // Logo
+                  FadeTransition(
                     opacity: _fadeAnimation,
-                    child: const Text(
-                      'CalendarIT',
-                      style: TextStyle(
-                        fontSize: 52,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -1.5,
-                        height: 1.1,
+                    child: ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Container(
+                        width: 140,
+                        height: 140,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 3,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child:Image.asset(
+                          'icons/logo_small.png', //TODO change to white
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 16),
+                  const SizedBox(height: 48),
 
-                // Subtitle
-                SlideTransition(
-                  position: _slideAnimation,
-                  child: FadeTransition(
+                  // App name
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: const Text(
+                        'CalendarIT',
+                        style: TextStyle(
+                          fontSize: 52,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: -1.5,
+                          height: 1.1,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Subtitle
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Text(
+                        'AI-powered calendar designed to\nkeep your events and deadlines on track',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w400,
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 60),
+
+                  // Features
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Center(
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 20,
+                          runSpacing: 20,
+                          children: [
+                            _buildFeatureItem(
+                              Icons.auto_fix_high_rounded,
+                              'AI Email Analysis',
+                              'AI reads and extracts the events from your emails',
+                            ),
+                            _buildFeatureItem(
+                              Icons.location_on_outlined,
+                              'AI Context Detection',
+                              'AI identifies dates, times, and locations intelligently',
+                            ),
+                            _buildFeatureItem(
+                              Icons.chat_bubble_outline_rounded,
+                              'AI Conversation',
+                              'Chat with AI Assistant to create the events naturally',
+                            ),
+                            _buildFeatureItem(
+                              Icons.image_search_rounded,
+                              'AI Vision Processing',
+                              'Use AI to extract event details from images and flyers',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 60),
+
+                  // Get Started Button
+                  AnimatedBuilder(
+                    animation: _pulseAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _pulseAnimation.value,
+                        child: Container(
+                          width: double.infinity,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFFFFFFF),
+                                Color(0xFFF1F5F9),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(32),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.1),
+                                blurRadius: 1,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () => context.go('/sign-in'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32),
+                              ),
+                            ),
+                            child: const Text(
+                              'Get Started',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1F2937),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Privacy note
+                  FadeTransition(
                     opacity: _fadeAnimation,
                     child: Text(
-                      'AI-powered calendar designed to\nkeep your events and deadlines on track',
+                      'Powered by AI • Privacy first • End-to-end encryption',
                       style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.7),
                         fontWeight: FontWeight.w400,
-                        height: 1.4,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 60),
-
-                // Features
-                SlideTransition(
-                  position: _slideAnimation,
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Center(
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 20,
-                        runSpacing: 20,
-                        children: [
-                          _buildFeatureItem(
-                            Icons.auto_fix_high_rounded,
-                            'AI Email Analysis',
-                            'AI reads and extracts the events from your emails',
-                          ),
-                          _buildFeatureItem(
-                            Icons.location_on_outlined,
-                            'AI Context Detection',
-                            'AI identifies dates, times, and locations intelligently',
-                          ),
-                          _buildFeatureItem(
-                            Icons.chat_bubble_outline_rounded,
-                            'AI Conversation',
-                            'Chat with AI Assistant to create the events naturally',
-                          ),
-                          _buildFeatureItem(
-                            Icons.image_search_rounded,
-                            'AI Vision Processing',
-                            'Use AI to extract event details from images and flyers',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                const Spacer(flex: 3),
-
-                // Get Started Button
-                AnimatedBuilder(
-                  animation: _pulseAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _pulseAnimation.value,
-                      child: Container(
-                        width: double.infinity,
-                        height: 64,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFFFFFFFF),
-                              Color(0xFFF1F5F9),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(32),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
-                            ),
-                            BoxShadow(
-                              color: Colors.white.withOpacity(0.1),
-                              blurRadius: 1,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () => context.go('/sign-in'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                          ),
-                          child: const Text(
-                            'Get Started',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 32),
-
-                // Privacy note
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Text(
-                    'Powered by AI • Privacy first • End-to-end encryption',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withOpacity(0.7),
-                      fontWeight: FontWeight.w400,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-              ],
+                  const SizedBox(height: 32),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+
 
   Widget _buildFeatureItem(IconData icon, String title, String description) {
     return Container(
