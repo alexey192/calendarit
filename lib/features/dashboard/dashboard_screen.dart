@@ -122,7 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 // Greeting (centered)
                                 Positioned(
                                   left: MediaQuery.of(context).size.width / 2 - 60, // adjust -60 if text is too far off
-                                  top: 20,
+                                  top: 12,
                                   child: Text(
                                     'Calendar IT',
                                     style: TextStyle(
@@ -136,7 +136,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 // Settings icon (right)
                                 Positioned(
                                   right: 0,
-                                  top: 12,
+                                  top: 0,
                                   child: IconButton(
                                     icon: const Icon(Icons.settings, color: Colors.white, size: 40),
                                     onPressed: () {
@@ -151,8 +151,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                       ),
                     ),
 
-
-                    const SizedBox(height: 12),
 
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
