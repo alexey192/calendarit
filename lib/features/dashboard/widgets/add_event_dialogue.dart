@@ -102,6 +102,10 @@ class _AddEventDialogState extends State<AddEventDialog> {
     );
   }
 
+
+  final List<String> _categories = ['Work', 'Personal', 'Fitness', 'Health']; //TODO define a list
+  String? _selectedCategory;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -203,7 +207,24 @@ class _AddEventDialogState extends State<AddEventDialog> {
                       text: _end == null ? '' : DateFormat.yMd().add_Hm().format(_end!),
                     ),
                   ),
+                  const SizedBox(height: 12),
+
+                  // Category
+                  DropdownButtonFormField<String>(
+                    value: _selectedCategory,
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _selectedCategory = value);
+                      }
+                    },
+                    items: _categories
+                        .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+                        .toList(),
+                    decoration: _inputDecoration('Category'),
+                  ),
                   const SizedBox(height: 24),
+
+
 
                   // Submit
                   SizedBox(
