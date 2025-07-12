@@ -10,6 +10,7 @@ class AnimatedEventCard extends StatefulWidget {
   final String date;
   final String location;
   final Function(String status) onUpdateStatus;
+  final VoidCallback? onEdit;
 
   const AnimatedEventCard({
     super.key,
@@ -18,6 +19,7 @@ class AnimatedEventCard extends StatefulWidget {
     required this.date,
     required this.location,
     required this.onUpdateStatus,
+    this.onEdit,
   });
 
   @override
@@ -114,14 +116,7 @@ class _AnimatedEventCardState extends State<AnimatedEventCard>
               if (_pendingUndo) return;
               _handleAction('declined');
             },
-            onEdit: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Edit coming soon'),
-                  backgroundColor: Color(0xFF2563EB),
-                ),
-              );
-            },
+            onEdit: widget.onEdit ?? () {},
             onTap: () {},
           ),
         ),
