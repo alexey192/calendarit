@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../models/connected_account.dart';
 import 'calendar_widgets/calendar_cubit.dart';
@@ -56,7 +57,16 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
+              colors: [
+                //Color(0xFF103750),
+                //Color(0xFF005C96),
+                //Color(0xFF0076B8),
+                Color(0xFF54A7D5),
+                Color(0xFF54A7D5),
+                //Color(0xFF9ECDEC),
+                // Color(0xFF0076BC),
+                // Color(0xFF0076BC),
+              ],
             ),
           ),
           child: SafeArea(
@@ -140,6 +150,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                   child: IconButton(
                                     icon: const Icon(Icons.settings, color: Colors.white, size: 40),
                                     onPressed: () {
+                                      context.go('/settings');
                                       // Open settings screen or modal
                                     },
                                   ),
