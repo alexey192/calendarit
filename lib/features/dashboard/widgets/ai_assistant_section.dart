@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:calendarit/app/app_colors.dart';
+import 'package:calendarit/features/dashboard/calendar_widgets/calendar_cubit.dart';
 import 'package:calendarit/features/dashboard/calendar_widgets/calendar_repository.dart';
 import 'package:calendarit/models/event_suggestion_model.dart';
 import 'package:calendarit/services/cloud_vision_ocr_service.dart';
@@ -241,7 +242,7 @@ class _ActionButtons extends StatelessWidget {
                     endDateTime: end,
                     location: location,
                   );
-
+                  context.read<CalendarCubit>().loadEvents();
                 },
               );
             },
