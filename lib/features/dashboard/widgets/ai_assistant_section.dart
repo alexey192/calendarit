@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import '../widgets/card_wrapper.dart';
+import 'add_event_dialogue.dart';
 
 class AIAssistantSection extends StatefulWidget {
   const AIAssistantSection({super.key});
@@ -155,7 +156,10 @@ class _ActionButtons extends StatelessWidget {
             icon: Icons.add_circle_outline,
             color: const Color(0xFF059669),
             onPressed: () {
-              // TODO: Add event manually
+              showDialog(
+                context: context,
+                builder: (context) => const AddEventDialog(),
+              );
             },
           ),
         ],

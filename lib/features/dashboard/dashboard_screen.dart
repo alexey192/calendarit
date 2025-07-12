@@ -56,7 +56,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899)],
+              colors: [
+                Color(0xFF005C96),
+                Color(0xFF0076B8),
+                Color(0xFF54A7D5),
+                Color(0xFF9ECDEC),
+              ],
             ),
           ),
           child: SafeArea(
