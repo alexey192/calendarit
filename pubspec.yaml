@@ -30,6 +30,8 @@ dependencies:
   flutter_chat_types: ^3.6.2
   googleapis_auth: ^2.0.0
   http: ^1.4.0
+  flutter_tesseract_ocr: ^0.4.28
+  file_picker: ^10.2.0
 
 dev_dependencies:
   flutter_test:

@@ -129,6 +129,7 @@ class PendingEventsSection extends StatelessWidget {
           endDateTime: end,
           location: location,
         );
+
         await _updateStatus(event.id, 'accepted');
       },
     );
