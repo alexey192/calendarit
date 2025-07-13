@@ -51,7 +51,7 @@ class AiImageHandler {
       if (image == null) return false;
 
       // Step 1: Show loading for OCR
-      await _showLoadingDialog(context, 'Extracting data from your image...');
+      _showLoadingDialog(context, 'Extracting data from your image...');
 
       final bytes = await image.readAsBytes();
       if (bytes == null) {
@@ -72,7 +72,7 @@ class AiImageHandler {
       }
 
       // Step 2: Show loading for GPT
-      await _showLoadingDialog(context, 'Parsing event from extracted text...');
+      _showLoadingDialog(context, 'Parsing event from extracted text...');
       final suggestion = await EventParserService.parseEventFromText(ocrText);
       navigator.pop();
 
