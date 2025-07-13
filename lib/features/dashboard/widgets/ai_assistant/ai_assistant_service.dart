@@ -1,28 +1,67 @@
-import 'dart:io';
-import 'package:calendarit/services/firestore_utils.dart';
+import 'dart:math';
+import 'package:calendarit/models/parsed_event_result.dart';
+import 'package:calendarit/models/event_suggestion_model.dart';
+import 'package:calendarit/services/event_parser_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:uuid/uuid.dart';
 
 import '../../../../services/cloud_vision_ocr_service.dart';
-import '../../../../services/event_parser_service.dart';
-import 'package:flutter/material.dart';
+import '../../../../services/firestore_utils.dart';
 
 class AiAssistantService {
   final _uuid = const Uuid();
+  static final types.User assistant = const types.User(id: 'assistant', firstName: 'AI Assistant');
 
-  Future<types.TextMessage?> handleUserMessage(String text) async {
-    final suggestion = await EventParserService.parseEventFromTextSmart(text);
+  static Future<types.Message> handleUserMessage(String inputText) async {
+    final result = await EventParserService.parseEventFromTextSmart(inputText);
 
-    if (suggestion != null && suggestion.event != null) {
-      await FirestoreUtils.saveEventWithPendingStatus(suggestion.event!);
-
-      return _assistant("Got it! I've added the event to your calendar as pending.");
-    } else if (suggestion != null && suggestion.missingInfoPrompt != null) {
-      return _assistant(suggestion.missingInfoPrompt!);
+    if (result == null) {
+      return _buildTextMessage(
+        'Oops, something went wrong while analyzing your message. Please try again later.',
+      );
     }
 
-    return _assistant("Thanks! Let me know if you want to extract info from a flyer too.");
+    if (result.event != null) {
+      final suggestion = EventSuggestion.fromJson(result.event!);
+      final lines = [
+        'Got it! Here’s what I understood from your message:',
+        '',
+        '**Title**: ${suggestion.title}',
+        '**Location**: ${suggestion.location}',
+        '**Time**: ${_formatTime(suggestion)}',
+        '**Category**: ${suggestion.category}',
+        '',
+        'Want me to add it to your calendar?',
+      ];
+
+      return _buildTextMessage(lines.join('\n'));
+    } else if (result.missingInfoPrompt != null && result.missingInfoPrompt!.trim().isNotEmpty) {
+      return _buildTextMessage(result.missingInfoPrompt!.trim());
+    } else {
+      return _buildTextMessage("I couldn't find event information in your message. Would you like to try again?");
+    }
+  }
+
+  static String _formatTime(EventSuggestion suggestion) {
+    if (!suggestion.isTimeSpecified) return 'Time not specified';
+
+    if (suggestion.start != null && suggestion.end != null) {
+      return '${suggestion.start} – ${suggestion.end}';
+    } else if (suggestion.start != null) {
+      return '${suggestion.start}';
+    } else {
+      return 'No specific time';
+    }
+  }
+
+  static types.TextMessage _buildTextMessage(String text) {
+    return types.TextMessage(
+      author: assistant,
+      id: Random().nextInt(999999).toString(),
+      text: text,
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+    );
   }
 
   Future<types.TextMessage?> handleAttachmentFlow() async {

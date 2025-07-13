@@ -10,6 +10,7 @@ import 'package:uuid/uuid.dart';
 import '../../auth/auth_cubit.dart';
 import '../widgets/card_wrapper.dart';
 import 'ai_assistant/action_buttons.dart';
+import 'ai_assistant/ai_assistant_service.dart';
 import 'ai_assistant/ai_image_handler.dart';
 
 class AIAssistantSection extends StatefulWidget {
@@ -20,6 +21,8 @@ class AIAssistantSection extends StatefulWidget {
 }
 
 class _AIAssistantSectionState extends State<AIAssistantSection> {
+  final AiAssistantService _aiAssistantService = AiAssistantService();
+
   final types.User _user = const types.User(id: 'user-1');
 
   final List<types.Message> _messages = [
@@ -41,6 +44,14 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
 
     setState(() {
       _messages.insert(0, textMessage);
+    });
+
+    AiAssistantService.handleUserMessage(message.text).then((response) {
+      if (response != null) {
+        setState(() {
+          _messages.insert(0, response);
+        });
+      }
     });
   }
 

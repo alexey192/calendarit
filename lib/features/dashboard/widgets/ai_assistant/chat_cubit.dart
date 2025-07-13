@@ -37,7 +37,7 @@ class ChatCubit extends Cubit<List<types.Message>> {
     emit([...state, userMessage]);
     await _persist();
 
-    final botMessage = await _service.handleUserMessage(message.text);
+    final botMessage = await AiAssistantService.handleUserMessage(message.text);
     if (botMessage != null) {
       emit([...state, userMessage, botMessage]);
       await _persist();
