@@ -17,6 +17,8 @@ class ParsedEventResult {
       'missingInfoPrompt': missingInfoPrompt,
     };
   }
+
+  bool get hasEvent => event != null && event!.isNotEmpty;
 }
 
 class SmartEventParseResult {

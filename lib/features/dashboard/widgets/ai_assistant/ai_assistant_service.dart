@@ -13,8 +13,16 @@ class AiAssistantService {
   final _uuid = const Uuid();
   static final types.User assistant = const types.User(id: 'assistant', firstName: 'AI Assistant');
 
-  static Future<types.TextMessage> handleUserMessage(String inputText) async {
-    final result = await EventParserService.parseEventFromTextSmart(inputText);
+  static List<String> getMissingRequiredFields(Map<String, dynamic> event) {
+    final requiredFields = ['title', 'start', 'end'];
+    return requiredFields.where((field) {
+      final value = event[field];
+      return value == null || (value is String && value.trim().isEmpty);
+    }).toList();
+  }
+
+  static Future<types.Message> handleUserMessage(String inputText, {Map<String, dynamic>? previousEvent}) async {
+    final result = await EventParserService.parseEventFromTextSmart(inputText, previousEvent: previousEvent);
 
     if (result == null) {
       return _buildTextMessage(
@@ -22,29 +30,42 @@ class AiAssistantService {
       );
     }
 
-    // If there's a parsed event, format the summary
-    final event = result.event;
-    if (event != null) {
-      print('Parsed event: ${event.toJson()}');
-      final suggestion = EventSuggestion.fromJson(event.event!);
-      final lines = [
-        result.reply.trim(),
-        '',
-        'Here’s what I understood from your message:',
-        '',
-        '**Title**: ${suggestion.title}',
-        '**Location**: ${suggestion.location}',
-        '**Time**: ${_formatTime(suggestion)}',
-        '**Category**: ${suggestion.category}',
-        '',
-        'Want me to add it to your calendar?',
-      ];
+    print('Parsed event result: ${result.toJson()}');
 
-      return _buildTextMessage(lines.join('\n').trim());
+    if (result.event != null && result.event!.hasEvent) {
+      final missingFields = getMissingRequiredFields(result.event!.event!);
+
+      print('Missing required fields: $missingFields');
+
+      if (missingFields.isEmpty) {
+        final suggestion = EventSuggestion.fromJson(result.event!.event!);
+        final lines = [
+          'Got it! Here’s what I understood from your message:',
+          '- Title: ${suggestion.title}',
+          '- Start: ${suggestion.start}',
+          '- End: ${suggestion.end}',
+          if (suggestion.location != null && suggestion.location!.isNotEmpty)
+            '- Location: ${suggestion.location}',
+          if (suggestion.description != null && suggestion.description!.isNotEmpty)
+            '- Description: ${suggestion.description}',
+        ];
+
+        return _buildTextMessage(lines.join('\n'));
+      } else {
+        final lines = <String>[
+          'Here’s what I understood so far:',
+          '- Title: ${result.event!.event!['title'] ?? '_missing_'}',
+          '- Start: ${result.event!.event!['start'] ?? '_missing_'}',
+          '- End: ${result.event!.event!['end'] ?? '_missing_'}',
+          '',
+          'Could you provide the missing info: ${missingFields.join(', ')}?',
+        ];
+
+        return _buildTextMessage(lines.join('\n'));
+      }
     }
 
-    // If no event, just return the smart reply
-    return _buildTextMessage(result.reply.trim());
+    return _buildTextMessage(result.reply ?? "I'm here to help! Want to add an event or share a flyer?");
   }
 
 

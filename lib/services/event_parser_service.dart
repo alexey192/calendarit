@@ -41,11 +41,14 @@ Text:
     return result?.parsedJson != null ? EventSuggestion.fromJson(result!.parsedJson!) : null;
   }
 
-  static Future<SmartEventParseResult?> parseEventFromTextSmart(String userInput) async {
+  static Future<SmartEventParseResult?> parseEventFromTextSmart(
+      String inputText, {
+        Map<String, dynamic>? previousEvent,
+      }) async {
     final currentDate = DateTime.now();
     final currentYear = currentDate.year;
 
-    final prompt = '''
+    var prompt = '''
 You are a helpful, intelligent AI chat assistant specialized in understanding and scheduling events from natural, free-form user messages. Your main task is to extract event details as structured JSON when possible, but also engage naturally and warmly in conversation when no event information is detected.
 
 Instructions:
@@ -86,12 +89,18 @@ Instructions:
 }
 ''';
 
+    if(previousEvent != null && previousEvent.isNotEmpty) {
+      prompt += '\n\n Previous event data: ${jsonEncode(previousEvent)}';
+    } else {
+      prompt += '\n\nNo previous event data available.';
+    }
+
     final body = jsonEncode({
       "model": "gpt-4",
       "temperature": 0.8,
       "messages": [
         {"role": "system", "content": prompt},
-        {"role": "user", "content": userInput},
+        {"role": "user", "content": inputText},
       ]
     });
 
@@ -110,12 +119,25 @@ Instructions:
       print("GPT response body: ${response.body}");
       final raw = jsonDecode(response.body);
       final content = raw['choices']?[0]?['message']?['content'];
+      print("GPT content: $content");
       if (content == null) return null;
 
       try {
         //try to parse json, parse it and return, if not, return reply in SmartEventParseResult
         if( content.startsWith('{') && content.endsWith('}')) {
-          final parsed = jsonDecode(content);
+          print("Parsing GPT reply as JSON: $content");
+
+          final parsed = ParsedEventResult(
+              event: jsonDecode(content),
+              missingInfoPrompt: null
+          );
+
+          if (parsed.event == null) {
+            print("Parsed event is null, returning empty result");
+            return SmartEventParseResult(reply: '', event: null);
+          }
+
+          print("Parsed event: ${parsed.toJson()}");
           return SmartEventParseResult(
             reply: '',
             event: parsed,

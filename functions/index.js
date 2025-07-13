@@ -177,7 +177,8 @@ Rules:
 
     const fullPrompt = `${prompt}\n\nSubject: ${subject}\n\nEmail Body:\n${body}`;
 
-    const openAiKey = process.env.OPENAI_API_KEY || 'your-key-here';
+    //const openAiKey = process.env.OPENAI_API_KEY || 'your-key-here';
+    const openAiKey = '[REDACTED_OPENAI_KEY]';
 
     const openAiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
