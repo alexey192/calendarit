@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:calendarit/features/dashboard/calendar_widgets/calendar_cubit.dart';
 import 'package:calendarit/features/dashboard/calendar_widgets/calendar_repository.dart';
+import 'package:calendarit/models/event_suggestion_model.dart';
+import 'package:calendarit/services/firestore_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
@@ -9,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../../auth/auth_cubit.dart';
 import '../widgets/card_wrapper.dart';
+import 'add_event_dialogue.dart';
 import 'ai_assistant/action_buttons.dart';
 import 'ai_assistant/ai_assistant_service.dart';
 import 'ai_assistant/ai_image_handler.dart';
@@ -46,11 +49,59 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
       _messages.insert(0, textMessage);
     });
 
-    AiAssistantService.handleUserMessage(message.text).then((response) {
+    AiAssistantService.handleUserMessage(message.text).then((response) async {
       if (response != null) {
         setState(() {
           _messages.insert(0, response);
         });
+
+        if(response is types.TextMessage
+        && response.metadata?['isSuccess'] == true
+        ) {
+          setState(() {
+            _messages.insert(0,
+              AiAssistantService.buildTextMessage(
+                'Now I will open a form to save this event in your events list.'
+              )
+            );
+          });
+
+          EventSuggestion suggestion = response.metadata?['eventSuggestion'];
+
+          final eventSuggestion = suggestion.toJson();
+          //parse start and end times in event suggestion
+          if (suggestion.start != null) {
+            eventSuggestion['start'] = DateTime.parse(suggestion.start.toString());
+          }
+          if (suggestion.end != null) {
+            eventSuggestion['end'] = DateTime.parse(suggestion.end.toString());
+          }
+
+          await showAddEventDialog(
+          context: context,
+          eventData: eventSuggestion,
+          accountIds: await FirestoreUtils.getAccountIds(),
+          onConfirm: ({
+            required String accountId,
+            required String title,
+            required DateTime start,
+            required DateTime end,
+            String? location,
+          }) async {
+            final newSuggestion = EventSuggestion(
+              title: title,
+              location: location ?? '',
+              start: start,
+              end: end,
+              isTimeSpecified: suggestion.isTimeSpecified,
+              description: suggestion.description,
+              category: suggestion.category,
+            );
+
+            await FirestoreUtils.saveEventWithPendingStatus(eventSuggestion);
+          },
+          );
+        }
       }
     });
   }

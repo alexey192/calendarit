@@ -34,6 +34,7 @@ class _AddEventDialogState extends State<AddEventDialog> {
 
   @override
   void initState() {
+    //print eventData
     super.initState();
     _titleController = TextEditingController(text: widget.eventData['title'] ?? '');
     _locationController = TextEditingController(text: widget.eventData['location'] ?? '');

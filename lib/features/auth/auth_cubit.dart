@@ -82,9 +82,15 @@ class AuthCubit extends Cubit<AuthState> {
 
   List<String> get accountIds {
     final currentState = state;
-    if (currentState is AuthSuccess) {
-      return currentState.accountIds;
+
+    if(isAuthenticated) {
+      if (currentState is AuthSuccess) {
+        return currentState.accountIds;
+      } else if (currentState is AuthInitial) {
+        return [];
+      }
     }
+
     return [];
   }
 

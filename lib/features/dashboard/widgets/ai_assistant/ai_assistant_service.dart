@@ -25,7 +25,7 @@ class AiAssistantService {
     final result = await EventParserService.parseEventFromTextSmart(inputText, previousEvent: previousEvent);
 
     if (result == null) {
-      return _buildTextMessage(
+      return buildTextMessage(
         'Oops, something went wrong while analyzing your message. Please try again later.',
       );
     }
@@ -50,7 +50,19 @@ class AiAssistantService {
             '- Description: ${suggestion.description}',
         ];
 
-        return _buildTextMessage(lines.join('\n'));
+        var successResponse =  buildTextMessage(lines.join('\n'));
+        successResponse.metadata?['isSuccess'] = true;
+        successResponse.metadata?['eventSuggestion'] = EventSuggestion(
+          title: suggestion.title,
+          location: suggestion.location,
+          start: suggestion.start,
+          end: suggestion.end,
+          isTimeSpecified: suggestion.isTimeSpecified,
+          description: suggestion.description,
+          category: suggestion.category,
+        );
+
+        return successResponse;
       } else {
         final lines = <String>[
           'Here’s what I understood so far:',
@@ -61,11 +73,13 @@ class AiAssistantService {
           'Could you provide the missing info: ${missingFields.join(', ')}?',
         ];
 
-        return _buildTextMessage(lines.join('\n'));
+        return buildTextMessage(lines.join('\n'));
       }
     }
 
-    return _buildTextMessage(result.reply ?? "I'm here to help! Want to add an event or share a flyer?");
+    return buildTextMessage(result.reply.isEmpty ?
+    "I'm here to help! Want to add an event or share a flyer?" 
+    : result.reply);
   }
 
 
@@ -81,12 +95,13 @@ class AiAssistantService {
     }
   }
 
-  static types.TextMessage _buildTextMessage(String text) {
+  static types.TextMessage buildTextMessage(String text) {
     return types.TextMessage(
       author: assistant,
       id: Random().nextInt(999999).toString(),
       text: text,
       createdAt: DateTime.now().millisecondsSinceEpoch,
+      metadata: <String, dynamic>{},
     );
   }
 

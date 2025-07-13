@@ -1,54 +1,45 @@
-import 'dart:convert';
+import 'package:calendarit/models/parsed_event_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import 'ai_assistant_service.dart';
 
-class ChatCubit extends Cubit<List<types.Message>> {
-  final AiAssistantService _service;
+part 'chat_state.dart';
+
+class ChatCubit extends Cubit<ChatState> {
+  ChatCubit() : super(ChatState.initial());
+
   final _uuid = const Uuid();
-  static const _chatKey = 'ai_chat_history';
 
-  ChatCubit(this._service) : super([]);
-
-  void loadHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getStringList(_chatKey) ?? [];
-    final history = raw.map((e) => types.TextMessage.fromJson(jsonDecode(e))).toList();
-    emit(history);
-  }
-
-  Future<void> _persist() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = state.map((e) => jsonEncode(e.toJson())).toList();
-    await prefs.setStringList(_chatKey, raw);
-  }
-
-  void handleMessage(types.PartialText message) async {
+  Future<void> sendMessage(String text) async {
     final userMessage = types.TextMessage(
-      id: _uuid.v4(),
       author: const types.User(id: 'user'),
-      text: message.text,
       createdAt: DateTime.now().millisecondsSinceEpoch,
+      id: _uuid.v4(),
+      text: text,
     );
 
-    emit([...state, userMessage]);
-    await _persist();
+    final updatedMessages = [userMessage, ...state.messages];
+    emit(state.copyWith(messages: updatedMessages));
 
-    final botMessage = await AiAssistantService.handleUserMessage(message.text);
-    if (botMessage != null) {
-      emit([...state, userMessage, botMessage]);
-      await _persist();
+    final reply = await AiAssistantService.handleUserMessage(
+      text,
+      previousEvent: state.previousEvent,
+    );
+
+    final updatedWithReply = [reply, ...updatedMessages];
+    emit(state.copyWith(messages: updatedWithReply));
+
+    // Parse and update previousEvent tracking
+    final parsed = reply.metadata?['parsedEventResult'] as ParsedEventResult?;
+    if (parsed != null && parsed.event != null && parsed.event!.isNotEmpty) {
+      final missing = AiAssistantService.getMissingRequiredFields(parsed.event!);
+      emit(state.copyWith(previousEvent: missing.isEmpty ? null : parsed.event));
     }
   }
 
-  void handleAttachment() async {
-    final result = await _service.handleAttachmentFlow();
-    if (result != null) {
-      emit([...state, result]);
-      await _persist();
-    }
+  void clearChat() {
+    emit(ChatState.initial());
   }
 }
