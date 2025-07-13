@@ -153,7 +153,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                     child: Image.asset(
                                       'icons/logo.png', //TODO change logo
                                       fit: BoxFit.contain,
-                                      color: Colors.white.withOpacity(0.9),
                                     ),
                                   ),
                                 ),

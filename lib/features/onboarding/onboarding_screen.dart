@@ -130,34 +130,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     opacity: _fadeAnimation,
                     child: ScaleTransition(
                       scale: _scaleAnimation,
-                      child: Container(
-                        width: 140,
-                        height: 140,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'assets/icons/logo_small.png', //TODO change to white
-                          fit: BoxFit.contain,
-                        ),
+                      child: Image.asset(
+                        'assets/icons/logo_small.png', // TODO: make sure it's a white version
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 32),
 
                   // App name
                   SlideTransition(
@@ -165,7 +147,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: FadeTransition(
                       opacity: _fadeAnimation,
                       child: const Text(
-                        'CalendarIT',
+                        'TUM CalendarIT',
                         style: TextStyle(
                           fontSize: 52,
                           fontWeight: FontWeight.w800,
