@@ -131,7 +131,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: ScaleTransition(
                       scale: _scaleAnimation,
                       child: Image.asset(
-                        'assets/icons/logo_small.png', // TODO: make sure it's a white version
+                        'assets/icons/logo_small.png',
                         width: 120,
                         height: 120,
                         fit: BoxFit.contain,
@@ -139,22 +139,18 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 0),
 
-                  // App name
+                  // App logo instead of text
                   SlideTransition(
                     position: _slideAnimation,
                     child: FadeTransition(
                       opacity: _fadeAnimation,
-                      child: const Text(
-                        'TUM CalendarIT',
-                        style: TextStyle(
-                          fontSize: 52,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: -1.5,
-                          height: 1.1,
-                        ),
+                      child: Image.asset(
+                        'assets/icons/logo_text.png',
+                        width: 380,
+                        height: 100,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
