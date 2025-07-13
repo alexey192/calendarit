@@ -70,7 +70,7 @@ Instructions:
 
 4. If any field is missing or unclear, fill it with null (for timestamps) or empty string (for text).
 
-5. If the user message contains no event information or is just casual chat, respond naturally and warmly, encouraging them to share event details or upload event images to assist.
+5. If the user message contains no event information or is just casual chat, respond naturally and warmly, encouraging them to share event details and upload event images or flyers to assist.
 
 6. Do not invent events or guess overly much; be precise and honest about missing info.
 
@@ -104,14 +104,27 @@ Instructions:
       body: body,
     );
 
+    print("GPT response status: ${response.statusCode}");
+
     if (response.statusCode == 200) {
+      print("GPT response body: ${response.body}");
       final raw = jsonDecode(response.body);
       final content = raw['choices']?[0]?['message']?['content'];
       if (content == null) return null;
 
       try {
-        final parsed = jsonDecode(content);
-        return SmartEventParseResult.fromJson(parsed);
+        //try to parse json, parse it and return, if not, return reply in SmartEventParseResult
+        if( content.startsWith('{') && content.endsWith('}')) {
+          final parsed = jsonDecode(content);
+          return SmartEventParseResult(
+            reply: '',
+            event: parsed,
+          );
+        } else {
+          return SmartEventParseResult(reply: content);
+        }
+
+
       } catch (e) {
         print("Failed to parse GPT reply: $e");
         return null;
