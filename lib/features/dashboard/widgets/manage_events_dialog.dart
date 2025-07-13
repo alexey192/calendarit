@@ -143,13 +143,13 @@ class _ManageEventsDialogState extends State<ManageEventsDialog> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.95),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -160,17 +160,35 @@ class _ManageEventsDialogState extends State<ManageEventsDialog> {
             return Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: color,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        color.withOpacity(0.5),
+                        color.withOpacity(0.6),
+                      ],
+                    ),
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
+                  child: Center(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.95),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ),
@@ -181,7 +199,7 @@ class _ManageEventsDialogState extends State<ManageEventsDialog> {
                       return Draggable<CalendarEvent>(
                         data: event,
                         feedback: Material(
-                          elevation: 4,
+                          elevation: 8,
                           borderRadius: BorderRadius.circular(20),
                           child: SizedBox(width: 300, child: _buildCard(event)),
                         ),
@@ -208,8 +226,24 @@ class _ManageEventsDialogState extends State<ManageEventsDialog> {
         height: MediaQuery.of(context).size.height * 0.8,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF005C96),
+              Color(0xFF0076B8),
+              Color(0xFF54A7D5),
+              Color(0xFF9ECDEC),
+            ],
+          ),
           borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -217,24 +251,36 @@ class _ManageEventsDialogState extends State<ManageEventsDialog> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF0076BC),
+                color: Colors.white.withOpacity(0.15),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
               ),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Manage Events',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.white.withOpacity(0.9),
                         fontWeight: FontWeight.w700,
                         fontSize: 20,
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.of(context).pop(),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.white.withOpacity(0.9)),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   )
                 ],
               ),
@@ -242,9 +288,9 @@ class _ManageEventsDialogState extends State<ManageEventsDialog> {
             Expanded(
               child: Row(
                 children: [
-                  _buildColumn('Accepted', acceptedEvents, Colors.green.shade700, 'accepted'),
-                  _buildColumn('Pending', pendingEvents, Colors.orange.shade700, 'pending'),
-                  _buildColumn('Declined', declinedEvents, Colors.red.shade700, 'declined'),
+                  _buildColumn('Accepted', acceptedEvents, Colors.green.shade700.withOpacity(0.5), 'accepted'),
+                  _buildColumn('Pending', pendingEvents, Colors.orange.shade700.withOpacity(0.5), 'pending'),
+                  _buildColumn('Declined', declinedEvents, Colors.red.shade700.withOpacity(0.5), 'declined'),
                 ],
               ),
             ),
