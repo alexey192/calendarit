@@ -9,6 +9,7 @@ class CalendarEvent {
   final String? location;
   final String? description;
   final String? status;
+  final String? category;
 
   CalendarEvent({
     required this.id,
@@ -18,6 +19,7 @@ class CalendarEvent {
     this.location,
     this.description,
     this.status,
+    this.category
   });
 
   factory CalendarEvent.fromMap(Map<String, dynamic> data, String id) {
@@ -49,6 +51,7 @@ class CalendarEvent {
       location: data['location'],
       description: data['description'],
       status: data['status'],
+      category: data['category'],
     );
   }
 }

@@ -44,7 +44,7 @@ class EventListWidget extends StatelessWidget {
               date: data['date'] ?? '',
               status: data['status'] ?? 'pending',
               source: data['source'] ?? '',
-              tag: data['tag'] ?? '',
+              category: data['tag'] ?? '',
               seen: data['seen'] ?? false,
               onTap: () {
                 Navigator.push(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../app/styles.dart';
 
 class EventCard extends StatelessWidget {
@@ -9,8 +8,9 @@ class EventCard extends StatelessWidget {
   final String date; // String like "July 23, 2025"
   final String status;
   final String source;
-  final String tag;
+  final String category;
   final bool seen;
+  final bool showActionButtons;
   final VoidCallback onTap;
   final VoidCallback? onConfirm;
   final VoidCallback? onDecline;
@@ -24,12 +24,13 @@ class EventCard extends StatelessWidget {
     required this.date,
     required this.status,
     required this.source,
-    required this.tag,
+    required this.category,
     required this.seen,
     required this.onTap,
     this.onConfirm,
     this.onDecline,
     this.onEdit,
+    this.showActionButtons = true,
   });
 
   Color _statusColor(String status) {
@@ -228,15 +229,15 @@ class EventCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const  Color(0xFF0076BC).withOpacity(0.1),
+                        color: const Color(0xFF0076BC).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        tag,
+                        category,
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color:  Color(0xFF0076BC),
+                          color: Color(0xFF0076BC),
                         ),
                       ),
                     ),
@@ -259,143 +260,139 @@ class EventCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 20),
-
-                // Action Buttons
-                Row(
-                  children: [
-                    // Confirm Button
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF10B981), Color(0xFF059669)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF10B981).withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
+                if (showActionButtons) ...[
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      // Confirm Button
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF10B981), Color(0xFF059669)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
                             borderRadius: BorderRadius.circular(12),
-                            onTap: onConfirm,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.check_rounded,
-                                    size: 18,
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Confirm',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF10B981).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: onConfirm,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.check_rounded,
+                                      size: 18,
                                       color: Colors.white,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Confirm',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-
-                    const SizedBox(width: 10),
-
-                    // Decline Button
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFEF4444).withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
+                      const SizedBox(width: 10),
+                      // Decline Button
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
                             borderRadius: BorderRadius.circular(12),
-                            onTap: onDecline,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.close_rounded,
-                                    size: 18,
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Decline',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFEF4444).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: onDecline,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.close_rounded,
+                                      size: 18,
                                       color: Colors.white,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Decline',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-
-                    const SizedBox(width: 10),
-
-                    // Edit Button
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.grey.shade300,
-                          width: 1,
-                        ),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
+                      const SizedBox(width: 10),
+                      // Edit Button
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(12),
-                          onTap: onEdit,
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: Icon(
-                              Icons.edit_rounded,
-                              size: 18,
-                              color: Colors.grey.shade600,
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: onEdit,
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              child: Icon(
+                                Icons.edit_rounded,
+                                size: 18,
+                                color: Colors.grey.shade600,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
