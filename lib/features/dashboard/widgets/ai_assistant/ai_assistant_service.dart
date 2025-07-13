@@ -13,7 +13,7 @@ class AiAssistantService {
   final _uuid = const Uuid();
   static final types.User assistant = const types.User(id: 'assistant', firstName: 'AI Assistant');
 
-  static Future<types.Message> handleUserMessage(String inputText) async {
+  static Future<types.TextMessage> handleUserMessage(String inputText) async {
     final result = await EventParserService.parseEventFromTextSmart(inputText);
 
     if (result == null) {
@@ -22,10 +22,15 @@ class AiAssistantService {
       );
     }
 
-    if (result.event != null) {
-      final suggestion = EventSuggestion.fromJson(result.event!);
+    // If there's a parsed event, format the summary
+    final event = result.event;
+    if (event != null) {
+      print('Parsed event: ${event.toJson()}');
+      final suggestion = EventSuggestion.fromJson(event.event!);
       final lines = [
-        'Got it! Here’s what I understood from your message:',
+        result.reply.trim(),
+        '',
+        'Here’s what I understood from your message:',
         '',
         '**Title**: ${suggestion.title}',
         '**Location**: ${suggestion.location}',
@@ -35,13 +40,13 @@ class AiAssistantService {
         'Want me to add it to your calendar?',
       ];
 
-      return _buildTextMessage(lines.join('\n'));
-    } else if (result.missingInfoPrompt != null && result.missingInfoPrompt!.trim().isNotEmpty) {
-      return _buildTextMessage(result.missingInfoPrompt!.trim());
-    } else {
-      return _buildTextMessage("I couldn't find event information in your message. Would you like to try again?");
+      return _buildTextMessage(lines.join('\n').trim());
     }
+
+    // If no event, just return the smart reply
+    return _buildTextMessage(result.reply.trim());
   }
+
 
   static String _formatTime(EventSuggestion suggestion) {
     if (!suggestion.isTimeSpecified) return 'Time not specified';
@@ -85,11 +90,11 @@ class AiAssistantService {
 
     final suggestion = await EventParserService.parseEventFromTextSmart(extractedText);
 
-    if (suggestion != null && suggestion.event != null) {
-      await FirestoreUtils.saveEventWithPendingStatus(suggestion.event!);
+    if (suggestion != null && suggestion.event != null && suggestion.event!.event != null) {
+      await FirestoreUtils.saveEventWithPendingStatus(suggestion.event!.event!);
       return _assistant("I extracted the event from the image and saved it as pending!");
-    } else if (suggestion != null && suggestion.missingInfoPrompt != null) {
-      return _assistant(suggestion.missingInfoPrompt!);
+    } else if (suggestion != null && suggestion.event?.missingInfoPrompt != null) {
+      return _assistant(suggestion.event!.missingInfoPrompt!);
     }
 
     return _assistant("I saw some text but couldn't detect an event. Try a different image?");

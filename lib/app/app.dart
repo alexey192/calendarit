@@ -1,3 +1,4 @@
+import 'package:calendarit/features/auth/auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -24,8 +25,23 @@ class SmartSchedulerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter router = GoRouter(
-      initialLocation: '/onboarding',
+      initialLocation: '/',
       routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) {
+            //dashboard if authenticated, otherwise onboarding
+            final authCubit = context.read<AuthCubit>();
+            final isAuthenticated = authCubit.isAuthenticated;
+            print('AuthCubit in / route: $authCubit');
+            print('Is authenticated: $isAuthenticated');
+            if (isAuthenticated) {
+              return DashboardScreen();
+            } else {
+              return const OnboardingScreen();
+            }
+          },
+        ),
         GoRoute(
           path: '/onboarding',
           builder: (context, state) => const OnboardingScreen(),

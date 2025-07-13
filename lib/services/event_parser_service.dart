@@ -41,54 +41,85 @@ Text:
     return result?.parsedJson != null ? EventSuggestion.fromJson(result!.parsedJson!) : null;
   }
 
-  static Future<ParsedEventResult?> parseEventFromTextSmart(String rawText) async {
-    final currentYear = DateTime.now().year;
+  static Future<SmartEventParseResult?> parseEventFromTextSmart(String userInput) async {
+    final currentDate = DateTime.now();
+    final currentYear = currentDate.year;
 
-    final prompt = '''You are an AI chat bot assistant that helps users schedule events based on free-form messages. The user might give full or partial event information, or no event at all.
-Extract a structured event as JSON if you can. If any details are missing (like time or location), return them as null or empty string.
+    final prompt = '''
+You are a helpful, intelligent AI chat assistant specialized in understanding and scheduling events from natural, free-form user messages. Your main task is to extract event details as structured JSON when possible, but also engage naturally and warmly in conversation when no event information is detected.
 
-Use $currentYear or next if the year is missing and the date has already passed.
-If time is not specified, set "isTimeSpecified" to false and set start and end to null.
-If the user provides a category, use it; otherwise, default to "other".
-If the user does not chat about scheduling events, just chat naturally and friendly with the user and I will use this response, and do not try to extract events, 
-but still encourage them to provide more details about any events they want to schedule or upload an image with event info to the chat.
+Instructions:
 
-Format in case you found an event:
+1. Parse the user’s message carefully to identify if it contains an event or multiple event details, even if partial or ambiguous.
+
+2. Extract event fields as precisely as possible:
+  - "title": short event name or summary.
+  - "location": event venue or place name.
+  - "start": ISO 8601 timestamp (e.g. "2025-07-13T15:00:00Z") or null if missing or unspecified.
+  - "end": ISO 8601 timestamp or null.
+  - "isTimeSpecified": true if the user explicitly mentioned a time, false if time is missing or vague.
+  - "description": a concise summary of the event.
+  - "category": one of the following fixed values: "Sport", "Music", "Education", "Work", "Health", "Arts & Culture", "Social & Entertainment", "Others".
+
+3. Date & time rules:
+  - If year is missing, assume the current year is $currentYear unless the date already passed this year, then roll over to next year.
+  - If time is not specified, set "isTimeSpecified": false, and "start" and "end" to null.
+  - If only a date is given without time, treat as all-day event with null times.
+  - Today's date it $currentDate.
+  - Handle ambiguous time expressions as best you can; otherwise leave times null and "isTimeSpecified": false.
+
+4. If any field is missing or unclear, fill it with null (for timestamps) or empty string (for text).
+
+5. If the user message contains no event information or is just casual chat, respond naturally and warmly, encouraging them to share event details or upload event images to assist.
+
+6. Do not invent events or guess overly much; be precise and honest about missing info.
+
+7. Format your output exactly as JSON like this when an event is found (no extra text):
 {
   "title": string,
   "location": string,
-  "start": ISO 8601 timestamp or null,
-  "end": ISO 8601 timestamp or null,
+  "start": string|null,
+  "end": string|null,
   "isTimeSpecified": boolean,
   "description": string,
   "category": string
 }
-
-User message:
-"""$rawText"""
 ''';
 
-    final result = await _callGptAndParse(prompt);
-    if (result == null) return null;
+    final body = jsonEncode({
+      "model": "gpt-4",
+      "temperature": 0.8,
+      "messages": [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": userInput},
+      ]
+    });
 
-    if (result.parsedJson != null) {
-      final suggestion = EventSuggestion.fromJson(result.parsedJson!);
-
-      final isComplete = [
-        suggestion.title,
-        suggestion.location,
-        suggestion.description,
-        suggestion.category,
-      ].every((field) => field.trim().isNotEmpty);
-
-      if (isComplete && suggestion.start != null && suggestion.end != null) {
-        return ParsedEventResult(event: suggestion.toJson());
-      }
-    }
-
-    return ParsedEventResult(
-      missingInfoPrompt: result.rawGptMessage.trim(),
+    final response = await http.post(
+      Uri.parse('https://api.openai.com/v1/chat/completions'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_apiKey', // already defined in your file
+      },
+      body: body,
     );
+
+    if (response.statusCode == 200) {
+      final raw = jsonDecode(response.body);
+      final content = raw['choices']?[0]?['message']?['content'];
+      if (content == null) return null;
+
+      try {
+        final parsed = jsonDecode(content);
+        return SmartEventParseResult.fromJson(parsed);
+      } catch (e) {
+        print("Failed to parse GPT reply: $e");
+        return null;
+      }
+    } else {
+      print("OpenAI error: ${response.body}");
+      return null;
+    }
   }
 
   static Future<GptEventResponse?> _callGptAndParse(String prompt) async {

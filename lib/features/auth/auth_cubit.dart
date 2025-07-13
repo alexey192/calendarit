@@ -87,4 +87,9 @@ class AuthCubit extends Cubit<AuthState> {
     }
     return [];
   }
+
+  //getter is authenticated
+  bool get isAuthenticated {
+    return _auth.currentUser != null;
+  }
 }
