@@ -4,6 +4,7 @@ import 'package:calendarit/models/event_suggestion_model.dart';
 import 'package:calendarit/services/event_parser_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../services/cloud_vision_ocr_service.dart';
@@ -33,6 +34,8 @@ class AiAssistantService {
     print('Parsed event result: ${result.toJson()}');
 
     if (result.event != null && result.event!.hasEvent) {
+      final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+
       final missingFields = getMissingRequiredFields(result.event!.event!);
 
       print('Missing required fields: $missingFields');
@@ -41,8 +44,8 @@ class AiAssistantService {
         final suggestion = EventSuggestion.fromJson(result.event!.event!);
         final lines = [
           'Got it! Here’s what I understood from your message:',
-          '- Title: ${suggestion.title}',
-          '- Start: ${suggestion.start}',
+          '- Start: ${dateFormat.format(suggestion.start!)}',
+          '- End: ${dateFormat.format(suggestion.end!)}',
           '- End: ${suggestion.end}',
           if (suggestion.location != null && suggestion.location!.isNotEmpty)
             '- Location: ${suggestion.location}',
@@ -67,8 +70,8 @@ class AiAssistantService {
         final lines = <String>[
           'Here’s what I understood so far:',
           '- Title: ${result.event!.event!['title'] ?? '_missing_'}',
-          '- Start: ${result.event!.event!['start'] ?? '_missing_'}',
-          '- End: ${result.event!.event!['end'] ?? '_missing_'}',
+          '- Start: ${result.event!.event!['start']==null ? '_missing_' : dateFormat.format(result.event!.event!['start'])}',
+          '- End: ${result.event!.event!['end']==null ? '_missing_' : dateFormat.format(result.event!.event!['end'])}',
           '',
           'Could you provide the missing info: ${missingFields.join(', ')}?',
         ];

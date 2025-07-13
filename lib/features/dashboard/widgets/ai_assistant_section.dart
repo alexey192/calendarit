@@ -61,7 +61,7 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
           setState(() {
             _messages.insert(0,
               AiAssistantService.buildTextMessage(
-                'Now I will open a form to save this event in your events list.'
+                'Now I will open a form to save this event in your calendar 📅'
               )
             );
           });
@@ -88,17 +88,15 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
             required DateTime end,
             String? location,
           }) async {
-            final newSuggestion = EventSuggestion(
+            await FirestoreUtils.addEventAccepted(eventSuggestion);
+            await context.read<CalendarRepository>().addEventToGoogleCalendar(
+              accountId: accountId,
               title: title,
-              location: location ?? '',
-              start: start,
-              end: end,
-              isTimeSpecified: suggestion.isTimeSpecified,
-              description: suggestion.description,
-              category: suggestion.category,
+              startDateTime: start,
+              endDateTime: end,
+              location: location,
             );
-
-            await FirestoreUtils.saveEventWithPendingStatus(eventSuggestion);
+            await context.read<CalendarCubit>().loadEvents();
           },
           );
         }

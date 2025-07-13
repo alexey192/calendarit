@@ -23,20 +23,20 @@ class FirestoreUtils {
         .add(enriched);
   }
 
-  static Future<void> saveEventSuggestionPending(EventSuggestion suggestion) async {
+  static Future<void> addEventAccepted(Map<String, dynamic> eventJson) async {
     final userId = await _getCurrentUserId();
     if (userId == null) return;
 
     final enriched = {
-      ...suggestion.toJson(),
-      'status': 'pending',
+      ...eventJson,
+      'status': 'accepted',
       'createdAt': FieldValue.serverTimestamp(),
     };
 
     await _firestore
         .collection('users')
         .doc(userId)
-        .collection('eventSuggestions')
+        .collection('events')
         .add(enriched);
   }
 
