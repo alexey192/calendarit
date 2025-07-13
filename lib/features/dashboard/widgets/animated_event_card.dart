@@ -11,6 +11,8 @@ class AnimatedEventCard extends StatefulWidget {
   final String location;
   final Function(String status) onUpdateStatus;
   final VoidCallback? onEdit;
+  final bool showActionButtons;
+  final String? category;
 
   const AnimatedEventCard({
     super.key,
@@ -20,6 +22,8 @@ class AnimatedEventCard extends StatefulWidget {
     required this.location,
     required this.onUpdateStatus,
     this.onEdit,
+    this.showActionButtons = true,
+    this.category,
   });
 
   @override
@@ -133,15 +137,17 @@ class _AnimatedEventCardState extends State<AnimatedEventCard>
             date: widget.date,
             location: widget.location,
             onAccept: () {
-              if (_pendingUndo) return;
+              if (_pendingUndo || !widget.showActionButtons) return;
               _handleAction('accepted');
             },
             onDecline: () {
-              if (_pendingUndo) return;
+              if (_pendingUndo || !widget.showActionButtons) return;
               _handleAction('declined');
             },
             onEdit: widget.onEdit ?? () {},
             onTap: () {},
+            showActionButtons: widget.showActionButtons,
+            category: widget.category,
           ),
         ),
       ),

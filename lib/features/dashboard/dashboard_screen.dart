@@ -15,6 +15,7 @@ import 'widgets/ai_assistant_section.dart';
 import 'calendar_widgets/calendar_section.dart';
 import 'widgets/dashboard_animations.dart';
 import 'widgets/todo_list_section.dart';
+import 'widgets/manage_events_dialog.dart'; // <-- New import for manage events dialog
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -38,6 +39,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   void dispose() {
     _animations.dispose();
     super.dispose();
+  }
+
+  void _openManageEventsDialog(List<CalendarEvent> allEvents, List<String> accountIds) {
+    showDialog(
+      context: context,
+      builder: (_) => ManageEventsDialog(
+        events: allEvents,
+        calendarRepository: calendarRepository,
+        accountIds: accountIds,
+      ),
+    );
   }
 
   @override
@@ -114,11 +126,13 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                         return accounts.isEmpty
                                             ? Row(
                                           children: [
-                                            Icon(Icons.link_off_rounded, size: 32, color: Colors.grey.shade300),
+                                            Icon(Icons.link_off_rounded,
+                                                size: 32, color: Colors.grey.shade300),
                                             const SizedBox(width: 8),
                                             Text(
                                               'No connections yet',
-                                              style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
+                                              style: TextStyle(
+                                                  fontSize: 16, color: Colors.grey.shade500),
                                             ),
                                             const SizedBox(width: 12),
                                             const AddNewCard(),
@@ -133,12 +147,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                   left: MediaQuery.of(context).size.width / 2 - 60,
                                   top: -55,
                                   child: SizedBox(
-                                    width: 200,  // adjust width & height to your logo size
+                                    width: 200,
                                     height: 200,
                                     child: Image.asset(
                                       'icons/logo.png', //TODO change logo
                                       fit: BoxFit.contain,
-                                      color: Colors.white.withOpacity(0.9), // optional: tint if logo is monochrome and you want it white
+                                      color: Colors.white.withOpacity(0.9),
                                     ),
                                   ),
                                 ),
@@ -191,23 +205,50 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                     .collection('users')
                                     .doc(user.uid)
                                     .collection('events')
-                                    .where('status', isEqualTo: 'pending')
-                                    .snapshots(),
+                                    .snapshots(), // fetch all events for manage dialog
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState == ConnectionState.waiting) {
                                     return const Center(child: CircularProgressIndicator());
                                   }
 
                                   final docs = snapshot.data?.docs ?? [];
-                                  final events = docs.map((doc) {
+                                  final allEvents = docs.map((doc) {
                                     final data = doc.data() as Map<String, dynamic>;
                                     return CalendarEvent.fromMap(data, doc.id);
                                   }).toList();
 
-                                  return PendingEventsSection(
-                                    events: events,
-                                    calendarRepository: calendarRepository,
-                                    accountIds: accountIds,
+                                  final pendingEvents = allEvents
+                                      .where((e) => e.status?.toLowerCase() == 'pending')
+                                      .toList();
+
+                                  return Stack(
+                                    children: [
+                                      PendingEventsSection(
+                                        events: pendingEvents,
+                                        calendarRepository: calendarRepository,
+                                        accountIds: accountIds,
+                                      ),
+                                      Positioned(
+                                        bottom: 12,
+                                        right: 12,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _openManageEventsDialog(allEvents, accountIds);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFF0076BC),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.list_alt,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   );
                                 },
                               ),
