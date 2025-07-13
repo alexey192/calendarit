@@ -41,13 +41,28 @@ class AiImageHandler {
     final navigator = Navigator.of(context);
 
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      print('Starting AI OCR Event Flow...');
+      final ImagePicker picker = ImagePicker();
+
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+      );
+      print('Image selected: ${image?.path}'); // Debugging line to check image selection
       if (image == null) return false;
 
       // Step 1: Show loading for OCR
       await _showLoadingDialog(context, 'Extracting data from your image...');
+
       final bytes = await image.readAsBytes();
+      if (bytes == null) {
+        debugPrint('Image bytes are null — possibly a web bug');
+        scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Failed to read image data.')));
+        return false;
+      }
+
+      print('Image bytes length: ${bytes.length}'); // Debugging line to check byte size
       final ocrText = await CloudVisionOcrService.extractTextFromImageBytes(bytes);
+      print('OCR Text: $ocrText'); // Debugging line to check OCR output
 
       navigator.pop();
 

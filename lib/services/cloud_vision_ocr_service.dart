@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:calendarit/app/const_values.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class CloudVisionOcrService {
@@ -55,6 +54,8 @@ class CloudVisionOcrService {
   static Future<String?> extractTextFromImageBytes(Uint8List bytes) async {
     final base64Image = base64Encode(bytes);
 
+    print("CloudVisionOcrService: Base64 encoded image size: ${base64Image.length} characters");
+
     final requestPayload = {
       'requests': [
         {
@@ -67,13 +68,27 @@ class CloudVisionOcrService {
     };
 
     try {
+      final requestBody = jsonEncode({
+        "requests": [
+          {
+            "image": {
+              "content": base64Image,
+            },
+            "features": [
+              {"type": "DOCUMENT_TEXT_DETECTION"}
+            ]
+          }
+        ]
+      });
+
       final response = await http.post(
-        Uri.parse('https://vision.googleapis.com/v1/images:annotate?key=$_apiKey'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(requestPayload),
+        Uri.parse("$_endpoint?key=$_apiKey"),
+        headers: {"Content-Type": "application/json"},
+        body: requestBody,
       );
 
       if (response.statusCode == 200) {
+        print('OCR API response: ${response.body.substring(0, 100)}...');
         final data = jsonDecode(response.body);
         return data['responses']?[0]?['fullTextAnnotation']?['text'];
       } else {
