@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../models/connected_account.dart';
 import '../auth/auth_cubit.dart';
@@ -158,11 +159,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 ),
                                 Positioned(
                                   right: 0,
-                                  top: 12,
+                                  top: 10,
                                   child: IconButton(
-                                    icon: const Icon(Icons.settings, color: Colors.white, size: 40),
-                                    onPressed: () {},
+                                    icon: const Icon(Icons.logout, color: Colors.white, size: 36),
+                                    onPressed: () async {
+                                      await FirebaseAuth.instance.signOut();
+                                      if (context.mounted) {
+                                        context.go('/sign-in'); // or your actual login/onboarding route
+                                      }
+                                    },
                                   ),
+
                                 ),
                               ],
                             ),
