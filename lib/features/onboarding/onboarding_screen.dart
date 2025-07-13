@@ -149,8 +149,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             ),
                           ],
                         ),
-                        child:Image.asset(
-                          'icons/logo_small.png', //TODO change to white
+                        child: Image.asset(
+                          'assets/icons/logo_small.png', //TODO change to white
                           fit: BoxFit.contain,
                         ),
                       ),
