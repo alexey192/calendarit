@@ -28,4 +28,16 @@ class EventSuggestion {
       category: json['category'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'location': location,
+      'start': start?.toIso8601String(),
+      'end': end?.toIso8601String(),
+      'isTimeSpecified': isTimeSpecified,
+      'description': description,
+      'category': category,
+    };
+  }
 }

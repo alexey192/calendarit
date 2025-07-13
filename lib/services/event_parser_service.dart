@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:calendarit/app/const_values.dart';
 import 'package:calendarit/models/event_suggestion_model.dart';
+import 'package:calendarit/models/parsed_event_result.dart';
 import 'package:http/http.dart' as http;
 
 class EventParserService {
@@ -63,4 +64,26 @@ Text:
 
     return null;
   }
+
+  static Future<ParsedEventResult?> parseEventFromTextSmart(String rawText) async {
+    final suggestion = await parseEventFromText(rawText);
+
+    if (suggestion == null) return null;
+
+    final isComplete = [
+      suggestion.title,
+      suggestion.location,
+      suggestion.description,
+      suggestion.category,
+    ].every((field) => field.trim().isNotEmpty);
+
+    if (isComplete && suggestion.start != null && suggestion.end != null) {
+      return ParsedEventResult(event: suggestion.toJson());
+    } else {
+      return ParsedEventResult(
+        missingInfoPrompt: "I found an event, but I need more details — like the time or location. Could you clarify?",
+      );
+    }
+  }
+
 }
