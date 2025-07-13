@@ -98,9 +98,7 @@ exports.handleGmailPush = onMessagePublished('gmail-watch-topic', async (event) 
   }
 
   const accountDoc = snapshot.docs[0];
-
   const { accessToken, refreshToken } = accountDoc.data();
-
   const segments = accountDoc.ref.path.split('/');
   const uid = segments[1];
   const accountId = segments[3];
@@ -108,9 +106,10 @@ exports.handleGmailPush = onMessagePublished('gmail-watch-topic', async (event) 
   console.log(`✅ Found account. UID: ${uid}, Account ID: ${accountId}`);
 
   const oAuth2Client = new google.auth.OAuth2();
-
-  oAuth2Client.setCredentials({ access_token: accessToken, refresh_token: refreshToken });
-  //oAuth2Client.setCredentials({ access_token: accessToken }); // no refresh_token
+  oAuth2Client.setCredentials({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
 
   const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
 
@@ -141,16 +140,44 @@ exports.handleGmailPush = onMessagePublished('gmail-watch-topic', async (event) 
     const subject = subjectHeader?.value || '';
     const body = extractBody(payload);
 
-    const prompt = `You are a smart assistant that reads the content of emails and extracts structured event information for a personal calendar. The expected format is:
-Location | Title | Description | Date | Tag`;
+    const prompt = `
+You are an intelligent email event analyzer. I will provide you with the full body of an email. Your task is to:
 
-    const fullPrompt = `${prompt}\n\n${subject}\n\n${body}`;
+1. Determine whether the email contains any information about an event or multiple events.
 
-    console.log(`🔍 Processing message ID: ${msg.id}`);
+2. If **no** event is mentioned, respond with:
+  {
+    "containsEvent": false
+  }
 
-    //console.log(`🔑 Using access token: ${process.env.OPENAI_API_KEY.substring(0, 10)}...`);
-    //const openAiKey = process.env.OPENAI_API_KEY;
-    const openAiKey = '[REDACTED_OPENAI_KEY]';
+3. If **one or more** events are mentioned, respond with a JSON object in this structure:
+  {
+    "containsEvent": true,
+    "events": [
+      {
+        "title": string,
+        "location": string,
+        "start": ISO 8601 timestamp (e.g., "2025-07-15T14:00:00") or null if no time/date is provided,
+        "end": ISO 8601 timestamp or null (see rules below),
+        "isTimeSpecified": boolean (true if a specific time is given, false if only date or general reference is given),
+        "description": string (a concise summary of the event),
+        "category": one of the following fixed values:
+          "Sport", "Music", "Education", "Work", "Health", "Arts & Culture", "Social & Entertainment", "Others"
+      }
+    ]
+  }
+
+Rules:
+- start = null if no date/time is provided.
+- end = null if start is null.
+- If start exists and end is missing but isTimeSpecified is true, set end = start + 1 hour.
+- isTimeSpecified = false for all-day or date-only events.
+- Use ISO 8601 for timestamps.
+`;
+
+    const fullPrompt = `${prompt}\n\nSubject: ${subject}\n\nEmail Body:\n${body}`;
+
+    const openAiKey = process.env.OPENAI_API_KEY || 'your-key-here';
 
     const openAiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -161,7 +188,7 @@ Location | Title | Description | Date | Tag`;
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: 'You extract calendar events from emails.' },
+          { role: 'system', content: 'You extract structured calendar events from emails.' },
           { role: 'user', content: fullPrompt },
         ],
         temperature: 0.2,
@@ -172,39 +199,70 @@ Location | Title | Description | Date | Tag`;
 
     if (!openAiRes.ok) {
       console.error(`❌ OpenAI API error (${openAiRes.status}):`, responseText);
-      throw new Error('OpenAI API error');
+      continue;
     }
 
-    const openAiJson = JSON.parse(responseText);
+    let parsed;
+    try {
+      parsed = JSON.parse(responseText);
+    } catch (err) {
+      console.error(`❌ Failed to parse OpenAI response for msg ${msg.id}`, responseText);
+      continue;
+    }
 
-    const text = openAiJson.choices?.[0]?.message?.content?.trim();
+    if (!parsed.containsEvent || !Array.isArray(parsed.events)) {
+      console.log(`📭 No events found in message ${msg.id}`);
+      continue;
+    }
 
-    console.log(`🔍 OpenAI response for message ID ${msg.id}: ${text}`);
+    for (const evt of parsed.events) {
+      const {
+        title,
+        location,
+        start,
+        end,
+        isTimeSpecified,
+        description,
+        category
+      } = evt;
 
-    if (!text || !text.includes('|')) continue; // No structured output
+      if (!title || !description || !category) {
+        console.warn(`⚠️ Skipping invalid event structure in message ${msg.id}`);
+        continue;
+      }
 
-    const [location, title, description, date, tag] = text.split('|').map(s => s.trim());
-    if (!title || !date) continue;
+      const validCategories = [
+        "Sport", "Music", "Education", "Work", "Health",
+        "Arts & Culture", "Social & Entertainment", "Others"
+      ];
+      if (!validCategories.includes(category)) {
+        console.warn(`⚠️ Invalid category "${category}" in message ${msg.id}`);
+        continue;
+      }
 
-    console.log(`📅 Extracted event: ${title} on ${date}`);
+      await admin.firestore().collection('users').doc(uid).collection('events').add({
+        title,
+        location: location || '',
+        start: start ? new Date(start) : null,
+        end: end ? new Date(end) : null,
+        isTimeSpecified: Boolean(isTimeSpecified),
+        description,
+        category,
+        seen: false,
+        status: 'pending',
+        source: 'gmail',
+        emailId: msg.id,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
-    await admin.firestore().collection('users').doc(uid).collection('events').add({
-      location,
-      title,
-      description,
-      date,
-      tag,
-      seen: false,
-      status: 'pending',
-      source: 'gmail',
-      emailId: msg.id,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+      console.log(`✅ Saved event from Gmail: ${title}`);
+    }
   }
 
-  // ✅ Update historyId for future sync
+  // ✅ Update lastHistoryId
   await accountRef.update({ lastHistoryId: historyId });
 });
+
 
 
 // 📦 Extract text body from Gmail payload
@@ -225,4 +283,5 @@ function extractBody(payload) {
   if (!data) return '';
   return Buffer.from(data, 'base64').toString('utf-8');
 }
+
 
