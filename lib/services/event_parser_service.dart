@@ -8,10 +8,12 @@ class EventParserService {
   static const _apiKey = ConstValues.openAiToken;
 
   static Future<EventSuggestion?> parseEventFromText(String rawText) async {
-    final prompt = '''
-You are an AI that extracts structured event information from free text that was automatically recognized on the photo. This could be a flyer or a poster about some event, or a text message that contains information about an event.
+    final currentYear = DateTime.now().year;
+
+    final prompt = '''You are an AI that extracts structured event information from free text that was automatically recognized on the photo. This could be a flyer or a poster about some event, or a text message that contains information about an event.
 Maybe there is no event at all, in which case you should return null.
-Return a single valid JSON object in the format below. If any field is missing in the input, fill with null or empty string. If the year is not specified, use the current year or the next if this date has already passed. If the time is not specified, set "isTimeSpecified" to false and set start and end to null.
+Return a single valid JSON object in the format below. If any field is missing in the input, fill with null or empty string.
+If the year is not specified, use $currentYear or the next if this date has already passed. If the time is not specified, set "isTimeSpecified" to false and set start and end to null.
 
 {
   "title": string,

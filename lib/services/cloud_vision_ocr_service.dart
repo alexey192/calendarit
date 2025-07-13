@@ -9,6 +9,7 @@ class CloudVisionOcrService {
   static const _endpoint = 'https://vision.googleapis.com/v1/images:annotate';
 
   static Future<String?> extractTextFromImage() async {
+    print("CloudVisionOcrService: Starting OCR process...");
     // Pick image
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,

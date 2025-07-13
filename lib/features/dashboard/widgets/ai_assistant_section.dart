@@ -179,6 +179,8 @@ class _ActionButtons extends StatelessWidget {
                 builder: (_) => const Center(child: CircularProgressIndicator()),
               );
 
+              print('Starting OCR process...');
+
               final ocrText = await CloudVisionOcrService.extractTextFromImage();
               Navigator.of(context).pop(); // close OCR loading
 
