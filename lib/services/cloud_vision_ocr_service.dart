@@ -51,4 +51,38 @@ class CloudVisionOcrService {
       return null;
     }
   }
+
+  static Future<String?> extractTextFromImageBytes(Uint8List bytes) async {
+    final base64Image = base64Encode(bytes);
+
+    final requestPayload = {
+      'requests': [
+        {
+          'image': {'content': base64Image},
+          'features': [
+            {'type': 'TEXT_DETECTION'},
+          ],
+        },
+      ],
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://vision.googleapis.com/v1/images:annotate?key=$_apiKey'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestPayload),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['responses']?[0]?['fullTextAnnotation']?['text'];
+      } else {
+        print('OCR API error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('OCR exception: $e');
+      return null;
+    }
+  }
 }
