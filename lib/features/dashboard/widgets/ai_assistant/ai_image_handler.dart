@@ -35,49 +35,67 @@ class AiImageHandler {
   static Future<bool> handleOcrAndEventFlow(
       BuildContext context,
       List<String> accountIds,
-      CalendarRepository calendarRepository,
-      ) async {
+      CalendarRepository calendarRepository, {
+        XFile? image,
+        bool isChat = false,
+        void Function(String message, {bool isAssistant})? onStatusUpdate,
+      }) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
 
     try {
       print('Starting AI OCR Event Flow...');
-      final ImagePicker picker = ImagePicker();
 
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-      );
-      print('Image selected: ${image?.path}'); // Debugging line to check image selection
-      if (image == null) return false;
+      if (image == null) {
+        final picker = ImagePicker();
+        image = await picker.pickImage(source: ImageSource.gallery);
+        print('Image selected via picker: ${image?.path}');
+        if (image == null) return false;
+      } else {
+        print('Image provided programmatically: ${image.path}');
+      }
 
-      // Step 1: Show loading for OCR
-      _showLoadingDialog(context, 'Extracting data from your image...');
+      onStatusUpdate?.call('🔍 Processing the image...', isAssistant: true);
 
+      // Step 1: OCR
       final bytes = await image.readAsBytes();
-      if (bytes == null) {
-        debugPrint('Image bytes are null — possibly a web bug');
-        scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Failed to read image data.')));
+      if (bytes.isEmpty) {
+        onStatusUpdate?.call('⚠️ Failed to read image data.', isAssistant: true);
         return false;
       }
 
-      print('Image bytes length: ${bytes.length}'); // Debugging line to check byte size
       final ocrText = await CloudVisionOcrService.extractTextFromImageBytes(bytes);
-      print('OCR Text: $ocrText'); // Debugging line to check OCR output
-
-      navigator.pop();
+      print('OCR Result: $ocrText');
 
       if (ocrText == null || ocrText.trim().isEmpty) {
-        scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Failed to extract text from image.')));
+        if(!isChat) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text('⚠️ I couldn’t read anything from that image.')),
+          );
+        }
+        else {
+          onStatusUpdate?.call('⚠️ I couldn’t read anything from that image.', isAssistant: true);
+        }
         return false;
       }
 
-      // Step 2: Show loading for GPT
-      _showLoadingDialog(context, 'Parsing event from extracted text...');
+      // Step 2: GPT parse
+      if(!isChat) {
+        navigator.pop();
+      }
+      onStatusUpdate?.call('🧠 Parsing event from text...', isAssistant: true);
       final suggestion = await EventParserService.parseEventFromText(ocrText);
-      navigator.pop();
 
       if (suggestion == null) {
-        scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Failed to extract event from text.')));
+        if(!isChat) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text('❌ Could not detect an event from the image.')),
+          );
+        }
+        else {
+          onStatusUpdate?.call('❌ Could not detect an event from the image.', isAssistant: true);
+        }
+
         return false;
       }
 
@@ -89,6 +107,11 @@ class AiImageHandler {
         'description': suggestion.description,
       };
 
+      if(!isChat) {
+        navigator.pop();
+      }
+
+      // Step 3: Open dialog
       await showAddEventDialog(
         context: context,
         eventData: eventData,
@@ -111,7 +134,6 @@ class AiImageHandler {
           );
 
           await _saveSuggestedEventToFirestore(newSuggestion);
-
           await calendarRepository.addEventToGoogleCalendar(
             accountId: accountId,
             title: title,
@@ -122,15 +144,17 @@ class AiImageHandler {
         },
       );
 
+      if(isChat) onStatusUpdate?.call('✅ I extracted the event and saved it as pending.', isAssistant: true);
       return true;
     } catch (e) {
       debugPrint('AI OCR Event Flow error: $e');
-      scaffoldMessenger.showSnackBar(const SnackBar(content: Text('Unexpected error during event processing.')));
+      if(isChat) onStatusUpdate?.call('🚨 An unexpected error occurred during image processing.', isAssistant: true);
       return false;
     }
   }
 
-  static Future<void> _showLoadingDialog(BuildContext context, String label) async {
+
+  static Future<void> showLoadingDialog(BuildContext context, String label) async {
     return showDialog(
       context: context,
       barrierDismissible: false,

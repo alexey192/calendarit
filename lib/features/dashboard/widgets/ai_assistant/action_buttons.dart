@@ -44,7 +44,14 @@ class ActionButtons extends StatelessWidget {
             icon: Icons.image,
             color: AppColors.primaryColor,
             onPressed: () async {
-              final result = await AiImageHandler.handleOcrAndEventFlow(context, accountIds, calendarRepository);
+              final result = await AiImageHandler.handleOcrAndEventFlow(
+                  context,
+                  accountIds,
+                  calendarRepository,
+                onStatusUpdate: (message, {isAssistant = false}) {
+                  AiImageHandler.showLoadingDialog(context, message);
+                },
+              );
               if (result != null) {
                 context.read<CalendarCubit>().loadEvents();
               }

@@ -1,9 +1,12 @@
 import 'dart:math';
+import 'package:calendarit/features/dashboard/calendar_widgets/calendar_cubit.dart';
 import 'package:calendarit/features/dashboard/calendar_widgets/calendar_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import '../../auth/auth_cubit.dart';
 import '../widgets/card_wrapper.dart';
 import 'ai_assistant/action_buttons.dart';
@@ -42,11 +45,51 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
   }
 
   void _handleAttachmentPressed() async {
-    final imageMessage = await AiImageHandler.pickAndConvertImageToMessage(_user);
-    if (imageMessage != null) {
-      setState(() => _messages.insert(0, imageMessage));
+    final uuid = const Uuid();
+
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    final imageMessage = types.ImageMessage(
+      author: _user,
+      id: uuid.v4(),
+      name: image.name,
+      size: await image.length(),
+      uri: image.path,
+    );
+
+    setState(() => _messages.insert(0, imageMessage));
+
+    final calendarRepository = context.read<CalendarRepository>();
+    final accountIds = context.read<AuthCubit>().accountIds;
+
+    // Define callback to inject chat messages
+    void onStatusUpdate(String msg, {bool isAssistant = true}) {
+      final chatMsg = types.TextMessage(
+        author: types.User(id: isAssistant ? 'assistant' : _user.id),
+        id: uuid.v4(),
+        text: msg,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      setState(() => _messages.insert(0, chatMsg));
+    }
+
+    final result = await AiImageHandler.handleOcrAndEventFlow(
+      context,
+      accountIds,
+      calendarRepository,
+      image: image,
+      onStatusUpdate: onStatusUpdate,
+      isChat: true,
+    );
+
+    if (result == true) {
+      context.read<CalendarCubit>().loadEvents();
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -86,17 +129,25 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
                     onSendPressed: _handleSendPressed,
                     onAttachmentPressed: _handleAttachmentPressed,
                     user: _user,
-                    theme: const DefaultChatTheme(
-                      inputBackgroundColor: Colors.white,
-                      inputTextColor: Colors.black87,
-                      inputBorderRadius: BorderRadius.all(Radius.circular(16)),
-                      inputTextStyle: TextStyle(fontSize: 16),
-                      backgroundColor: Colors.transparent,
-                      primaryColor: Color(0xFF0076BC),
-                      secondaryColor: Color(0xFF9ECDEC),
-                      receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
-                      sentMessageBodyTextStyle: TextStyle(color: Colors.white),
-                    ),
+                      theme: DefaultChatTheme(
+                        inputBackgroundColor: Colors.white,
+                        inputTextColor: Colors.black87,
+                        inputBorderRadius: BorderRadius.all(Radius.circular(16)),
+                        inputTextStyle: TextStyle(fontSize: 16),
+                        backgroundColor: Colors.transparent,
+                        primaryColor: Color(0xFF0076BC),
+                        secondaryColor: Color(0xFF9ECDEC),
+                        receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
+                        sentMessageBodyTextStyle: TextStyle(color: Colors.white),
+                        inputContainerDecoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                          border: Border.all(
+                            color: Color(0xFF0076BC),
+                            width: 1.2,
+                          ),
+                        ),
+                      ),
                   ),
                 ),
               ),
