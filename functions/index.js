@@ -173,6 +173,7 @@ Rules:
 - If start exists and end is missing but isTimeSpecified is true, set end = start + 1 hour.
 - isTimeSpecified = false for all-day or date-only events.
 - Use ISO 8601 for timestamps.
+- reply only with a json object, no additional text.
 `;
 
     const fullPrompt = `${prompt}\n\nSubject: ${subject}\n\nEmail Body:\n${body}`;
@@ -196,20 +197,29 @@ Rules:
       }),
     });
 
-    const responseText = await openAiRes.text();
+    const json = await openAiRes.json();
 
     if (!openAiRes.ok) {
-      console.error(`❌ OpenAI API error (${openAiRes.status}):`, responseText);
+      console.error(`❌ OpenAI API error (${openAiRes.status}):`, JSON.stringify(json));
       continue;
+    }
+
+    let content = json.choices?.[0]?.message?.content?.trim() || '';
+    // Remove markdown formatting if present
+    if (content.startsWith('```json')) {
+      content = content.replace(/^```json\s*/, '').replace(/\s*```$/, '');
     }
 
     let parsed;
     try {
-      parsed = JSON.parse(responseText);
+      parsed = JSON.parse(content);
     } catch (err) {
-      console.error(`❌ Failed to parse OpenAI response for msg ${msg.id}`, responseText);
+      console.error(`❌ Failed to parse JSON content for msg ${msg.id}`, content);
       continue;
     }
+
+    console.log(`📄 Parsed response for msg ${msg.id}:`, JSON.stringify(parsed, null, 2));
+    console.log(`📄 Parsed response for msg ${msg.id}:`, JSON.stringify(parsed, null, 2));
 
     if (!parsed.containsEvent || !Array.isArray(parsed.events)) {
       console.log(`📭 No events found in message ${msg.id}`);

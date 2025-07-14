@@ -15,8 +15,22 @@ class CalendarSection extends StatelessWidget {
     return BlocBuilder<CalendarCubit, CalendarState>(
       builder: (context, state) {
         if (state is CalendarLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return CardWrapper(
+            height: 400,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         } else if (state is CalendarError) {
+          return CardWrapper(
+            height: 400,
+            child: Center(
+              child: Text(
+                'Error loading calendar: ${state.message}',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          );
           return Center(child: Text('Error: ${state.message}', style: const TextStyle(color: Colors.white)));
         } else if (state is CalendarLoaded) {
           return CardWrapper(
