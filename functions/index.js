@@ -251,6 +251,11 @@ Rules:
         continue;
       }
 
+      // - If start exists and end is missing set end = start + 1 hour.
+      let eventEnd = end ?
+        new Date(end) :
+        (start ? new Date(new Date(start).getTime() + 60 * 60 * 1000) : null);
+
       await admin.firestore().collection('users').doc(uid).collection('events').add({
         title,
         location: location || '',
