@@ -1,15 +1,17 @@
-import 'package:calendarit/app/const_values.dart';
+import 'package:calendarit/app/secret_values.dart';
 import 'package:calendarit/models/calendar_event.dart';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../app/endpoints.dart';
+
 
 class CalendarRepository {
-  static const _tokenEndpoint = ConstValues.tokenEndpoint;
-  static const _clientId = ConstValues.clientId;
-  static const _clientSecret = ConstValues.clientSecret;
+  static const _tokenEndpoint = Endpoints.tokenEndpoint;
+  static const _clientId = SecretValues.clientId;
+  static const _clientSecret = SecretValues.clientSecret;
 
   Future<List<CalendarEvent>> fetchCalendarEvents() async {
     final user = FirebaseAuth.instance.currentUser;

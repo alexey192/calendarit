@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:calendarit/app/const_values.dart';
+import 'package:calendarit/app/secret_values.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
+import '../app/endpoints.dart';
+
 class CloudVisionOcrService {
-  static const _apiKey = ConstValues.googleApiKey;
-  static const _endpoint = 'https://vision.googleapis.com/v1/images:annotate';
+  static const _apiKey = SecretValues.googleApiKey;
+  static const _endpoint = Endpoints.googleVisionEndpoint;
 
   static Future<String?> extractTextFromImage() async {
     print("CloudVisionOcrService: Starting OCR process...");

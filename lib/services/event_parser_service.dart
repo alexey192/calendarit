@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:calendarit/app/const_values.dart';
+import 'package:calendarit/app/secret_values.dart';
 import 'package:calendarit/models/event_suggestion_model.dart';
 import 'package:calendarit/models/parsed_event_result.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +13,7 @@ class GptEventResponse {
 
 class EventParserService {
   static const _gptEndpoint = 'https://api.openai.com/v1/chat/completions';
-  static const _apiKey = ConstValues.openAiToken;
+  static const _apiKey = SecretValues.openAiToken;
 
   static Future<EventSuggestion?> parseEventFromText(String rawText) async {
     final currentYear = DateTime.now().year;
