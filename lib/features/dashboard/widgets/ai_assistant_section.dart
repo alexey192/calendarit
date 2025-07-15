@@ -121,7 +121,8 @@ class _AIAssistantSectionState extends State<AIAssistantSection> {
     setState(() => _messages.insert(0, imageMessage));
 
     final calendarRepository = context.read<CalendarRepository>();
-    final accountIds = context.read<AuthCubit>().accountIds;
+    final accountIds = await FirestoreUtils.getAccountIds();
+    //final accountIds = context.read<AuthCubit>().accountIds;
 
     // Define callback to inject chat messages
     void onStatusUpdate(String msg, {bool isAssistant = true}) {

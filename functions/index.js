@@ -252,16 +252,28 @@ Rules:
       }
 
       // - If start exists and end is missing set end = start + 1 hour.
-      let eventEnd = end ?
+      /*let eventEnd = end ?
         new Date(end) :
-        (start ? new Date(new Date(start).getTime() + 60 * 60 * 1000) : null);
+        (start ? new Date(new Date(start).getTime() + 60 * 60 * 1000) : null);*/
+        function fromUtcPlus2ToUtc(isoString) {
+          const localDate = new Date(isoString);
+          const utcTimestamp = localDate.getTime() - 2 * 60 * 60 * 1000;
+          return new Date(utcTimestamp);
+        }
+
+        const eventStart = start ? fromUtcPlus2ToUtc(start) : null;
+        const eventEnd = end
+          ? fromUtcPlus2ToUtc(end)
+          : (eventStart ? new Date(eventStart.getTime() + 60 * 60 * 1000) : null);
+
 
       await admin.firestore().collection('users').doc(uid).collection('events').add({
         title,
         location: location || '',
-        start: start ? new Date(start) : null,
-        end: end ? new Date(end) : null,
-        isTimeSpecified: Boolean(isTimeSpecified),
+        //start: start ? new Date(start) : null,
+        //end: end ? new Date(end) : null,
+        start: eventStart,
+        end: eventEnd,
         description,
         category,
         seen: false,
