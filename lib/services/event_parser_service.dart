@@ -70,7 +70,7 @@ Instructions:
   - If year is missing, assume the current year is $currentYear unless the date already passed this year, then roll over to next year.
   - If time is not specified, set "isTimeSpecified": false, and "start" and "end" to null.
   - If only a date is given without time, treat as all-day event with null times.
-  - Today's date it $currentDate.
+  - Today's date is $currentDate.
   - Handle ambiguous time expressions as best you can; otherwise leave times null and "isTimeSpecified": false.
 
 4. If any field is missing or unclear, fill it with null (for timestamps) or empty string (for text).
