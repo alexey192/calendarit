@@ -1,4 +1,6 @@
-# 📅 CalendarIT
+<img alt="logo_small_with_background.png" src="https://github.com/alexey192/calendarit/blob/master/assets/icons/logo_small_with_background.png?raw=true" data-hpc="true" class="Box-sc-g0xbh4-0 fzFXnm" width=100>
+
+# TUM CalendarIT
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-blue)](https://flutter.dev)
