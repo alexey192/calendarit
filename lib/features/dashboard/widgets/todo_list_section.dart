@@ -9,7 +9,7 @@ class TodoListSection extends StatefulWidget {
 
 class _TodoListSectionState extends State<TodoListSection> {
   final List<_TodoItem> _todos = [
-    _TodoItem('Prepare pitch deck'),
+    //_TodoItem('Prepare pitch deck'),
   ];
 
   final TextEditingController _controller = TextEditingController();
@@ -121,7 +121,14 @@ class _TodoListSectionState extends State<TodoListSection> {
 
               // Scrollable list of to-do items
               Expanded(
-                child: ListView.separated(
+                child: _todos.isEmpty
+                    ? Center(
+                  child: Text(
+                    'No tasks yet',
+                    style: TextStyle(color: Colors.black45.withOpacity(0.8)),
+                  ),
+                )
+                    : ListView.separated(
                   itemCount: _todos.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 6),
                   itemBuilder: (context, index) {
@@ -129,12 +136,12 @@ class _TodoListSectionState extends State<TodoListSection> {
 
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.symmetric(vertical: 0),   // smaller margin
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), // smaller padding
+                      margin: const EdgeInsets.symmetric(vertical: 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: todo.isDone
-                            ? Color(0xFF059669).withOpacity(0.1)//Colors.greenAccent.withOpacity(0.3)
-                            : Color(0xFF9ECDEC).withOpacity(0.3),// const Color(0xFFEDE9FE),
+                            ? Color(0xFF059669).withOpacity(0.1)
+                            : Color(0xFF9ECDEC).withOpacity(0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -145,7 +152,7 @@ class _TodoListSectionState extends State<TodoListSection> {
                               todo.isDone
                                   ? Icons.check_circle
                                   : Icons.radio_button_unchecked,
-                              color: todo.isDone ? Color(0xFF059669).withOpacity(1) : Color(0xFF0076B8),
+                              color: todo.isDone ? Color(0xFF059669) : Color(0xFF0076B8),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -153,9 +160,10 @@ class _TodoListSectionState extends State<TodoListSection> {
                             child: Text(
                               todo.title,
                               style: TextStyle(
-                                fontSize: 14,  // smaller font size
+                                fontSize: 14,
                                 color: Colors.black87,
-                                decoration: todo.isDone ? TextDecoration.lineThrough : null,
+                                decoration:
+                                todo.isDone ? TextDecoration.lineThrough : null,
                               ),
                             ),
                           ),
