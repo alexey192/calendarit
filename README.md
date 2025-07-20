@@ -4,8 +4,8 @@
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-blue)](https://flutter.dev)
 [![Firebase](https://img.shields.io/badge/Backend-Firebase-orange)](https://firebase.google.com)
 
-#### CalendarIT is an AI-powered calendar assistant that helps you keep all your events and deadlines on track. It extracts events from your Gmail, uploaded images and notes, then lets you review and sync accepted ones directly to your Google Calendar — all through a clean, intuitive interface.
-#### Originally developed for students at TUM, CalendarIT is built with GPT-4o and Flutter Web and is designed to consolidate scattered event info into one easy-to-use timeline. It’s scalable and ready to help anyone stay organized.
+#### TUM CalendarIT is an AI-powered calendar assistant that helps you keep all your events and deadlines on track. It extracts events from your Gmail, uploaded images and notes, then lets you review and sync accepted ones directly to your Google Calendar — all through a clean, intuitive interface.
+#### Originally developed for students at TUM, TUM CalendarIT is built with GPT-4o and Flutter Web and is designed to consolidate scattered event info into one easy-to-use timeline. It’s scalable and ready to help anyone stay organized.
 ---
 
 ## ✨ Features
