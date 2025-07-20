@@ -47,7 +47,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: '[REDACTED_GOOGLE_API_KEY]',
+    apiKey: 'AIzaSyD1EeRDav4LHfxjs3-g3LqsaU-G1i-WEo0',
     appId: '1:291994231151:web:2011f9d7aca5b5dbd3089a',
     messagingSenderId: '291994231151',
     projectId: 'calendar-it-31e1c',
@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: '[REDACTED_GOOGLE_API_KEY]',
+    apiKey: 'AIzaSyCBcKhH9tK59UcvRrrCBc9uze_cuaMIJGU',
     appId: '1:291994231151:android:bbff3f20d1d1db8ed3089a',
     messagingSenderId: '291994231151',
     projectId: 'calendar-it-31e1c',
@@ -67,7 +67,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: '[REDACTED_GOOGLE_API_KEY]',
+    apiKey: 'AIzaSyDDCL_Yv5o__ibm3FNUv57lzw2vz2aQO8E',
     appId: '1:291994231151:ios:3dc53150e94a5ef6d3089a',
     messagingSenderId: '291994231151',
     projectId: 'calendar-it-31e1c',

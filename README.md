@@ -1,4 +1,6 @@
-# 📅 CalendarIT
+<img alt="logo_small_with_background.png" src="assets/icons/logo_small_with_background.png?raw=true" data-hpc="true" class="Box-sc-g0xbh4-0 fzFXnm" width=100>
+
+# TUM CalendarIT
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-blue)](https://flutter.dev)
@@ -263,7 +265,7 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## 📬 Contact
 
-For questions or feedback, feel free to [open an issue](https://github.com/your-repo/issues) or contact us directly:
+For questions or feedback, feel free to [open an issue](https://github.com/alexey192/calendarit/issues) or contact us directly:
 
 - Nathan Nozik — [nathan.nozik@tum.de](mailto:nathan.nozik@tum.de)
 - Sergey Sarkisyan — [sergey.sarkisyan@tum.de](mailto:sergey.sarkisyan@tum.de)
@@ -272,9 +274,9 @@ For questions or feedback, feel free to [open an issue](https://github.com/your-
 ## 🧑‍💻 Authors
 
 - [Alexey Bednik](https://www.linkedin.com/in/bednik)
-- [Klaudia Klara Paździerz](https://www.linkedin.com/in/klaudia-pa%C5%BAdzierz-6772922a7/)
+- [Klaudia Paździerz](https://www.linkedin.com/in/klaudia-pa%C5%BAdzierz-6772922a7/)
 - [Konstantin Pörschke](https://www.linkedin.com/in/konstantin-porschke/)
-- Nathan Nozik
+- [Nathan Nozik](mailto:nathan.nozik@tum.de)
 - [Sergey Sarkisyan](https://www.linkedin.com/in/sergey_sarkisyan)
 
 ## 📄 License
