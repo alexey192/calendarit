@@ -265,7 +265,7 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## 📬 Contact
 
-For questions or feedback, feel free to [open an issue](https://github.com/your-repo/issues) or contact us directly:
+For questions or feedback, feel free to [open an issue](https://github.com/alexey192/calendarit/issues) or contact us directly:
 
 - Nathan Nozik — [nathan.nozik@tum.de](mailto:nathan.nozik@tum.de)
 - Sergey Sarkisyan — [sergey.sarkisyan@tum.de](mailto:sergey.sarkisyan@tum.de)
