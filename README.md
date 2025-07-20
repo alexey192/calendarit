@@ -276,7 +276,7 @@ For questions or feedback, feel free to [open an issue](https://github.com/alexe
 - [Alexey Bednik](https://www.linkedin.com/in/bednik)
 - [Klaudia Klara Paździerz](https://www.linkedin.com/in/klaudia-pa%C5%BAdzierz-6772922a7/)
 - [Konstantin Pörschke](https://www.linkedin.com/in/konstantin-porschke/)
-- [Nathan Nozik]((mailto:nathan.nozik@tum.de))
+- [Nathan Nozik](mailto:nathan.nozik@tum.de)
 - [Sergey Sarkisyan](https://www.linkedin.com/in/sergey_sarkisyan)
 
 ## 📄 License
